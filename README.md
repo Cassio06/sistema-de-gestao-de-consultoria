@@ -1,6 +1,6 @@
 # Sistema de Gestão de Consultoria
 
-Projeto acadêmico em Java para gerenciar clientes, consultores, contratos, projetos, faturamento e fidelidade da empresa fictícia **Planilha Certa**. Desenvolvido para a disciplina de **Programação Orientada a Objetos** (Trabalho da P2) do **iCEV — Instituto de Ensino Superior**.
+Projeto acadêmico em Java para gerenciar clientes, consultores, contratos, projetos, faturamento e fidelidade em uma empresa de consultoria. Desenvolvido para a disciplina de **Programação Orientada a Objetos** (Trabalho da P2) do **iCEV — Instituto de Ensino Superior**.
 
 O tema atribuído à equipe está no [enunciado S10a — Gestão de Consultoria](S10a%20-%20Gest%C3%A3o%20de%20Consultoria.docx.pdf).
 
@@ -8,7 +8,7 @@ O tema atribuído à equipe está no [enunciado S10a — Gestão de Consultoria]
 
 ## Objetivo e Contexto do Problema
 
-A empresa de consultoria **“Planilha Certa”** oferece serviços personalizados de **planejamento financeiro**, **gestão empresarial** e **análise de dados (TI)** para diversos clientes.
+A empresa de consultoria oferece serviços personalizados de **planejamento financeiro**, **gestão empresarial** e **análise de dados (TI)** para diversos clientes.
 
 O objetivo deste sistema é gerenciar o cadastro de clientes, consultores, contratos de consultoria e o controle de projetos e suas etapas. Clientes **VIP** possuem atendimento prioritário, descontos exclusivos e relatórios personalizados com recomendações. Cada projeto é dividido em etapas com prazos e valores específicos, permitindo monitorar o progresso, faturar por etapa ou na entrega final, acumular pontos em um programa de fidelidade e emitir relatórios de desempenho.
 
@@ -110,7 +110,7 @@ sistema-de-gestao-de-consultoria/
 ├── Pessoa.java
 ├── main.class
 ├── README.md                                # Documentação principal do projeto
-├── S10a - Gestão de Consultoria.docx.pdf    # Enunciado específico da equipe (Planilha Certa)
+├── S10a - Gestão de Consultoria.docx.pdf    # Enunciado específico da equipe
 └── Trabalho P2.pdf                          # Diretrizes gerais e critérios de avaliação da P2
 ```
 
