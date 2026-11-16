@@ -1,6 +1,6 @@
 # Pacote `service`
 
-Espaço reservado para as regras de negócio da consultoria **Planilha Certa**:
+Espaço reservado para as regras de negócio do **Sistema de Gestão de Consultoria**:
 - Cadastro e gerenciamento de clientes, consultores e contratos.
 - Alocação automática de consultores (máx. 3 projetos ativos, menor carga, prioridade para clientes VIP).
 - Controle de etapas, verificação automática de atrasos e cálculo de progresso do projeto.
