@@ -12,7 +12,9 @@
 
 - **Instituição:** iCEV — Instituto de Ensino Superior
 - **Disciplina:** Programação Orientada a Objetos (Trabalho da P2)
-- **Tema atribuído:** S10a — Gestão de Consultoria (“Planilha Certa”)
+- **Projeto:** Sistema de Gestão de Consultoria
+- **Tema atribuído:** [S10a — Gestão de Consultoria](../S10a%20-%20Gest%C3%A3o%20de%20Consultoria.docx.pdf)
+- **Empresa fictícia:** Planilha Certa
 - **Integrantes:**
   - Cezar Gabriel de Souza Vicente Mendes
   - Artur Henrique Da Silva Alencar

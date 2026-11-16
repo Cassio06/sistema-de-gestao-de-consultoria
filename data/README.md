@@ -1,6 +1,6 @@
 # Diretório de Persistência (`data/`)
 
-Este diretório armazena os arquivos de dados utilizados pelo sistema **Planilha Certa** (em formato `CSV`, `JSON` ou `TXT`, conforme exigido nas diretrizes do `Trabalho P2.pdf`).
+Este diretório armazena os arquivos de dados utilizados pelo **Sistema de Gestão de Consultoria** (em formato `CSV`, `JSON` ou `TXT`, conforme exigido nas diretrizes do `Trabalho P2.pdf`).
 
 ## Arquivos Previstos
 - `clientes.(csv|json|txt)` — Cadastro de clientes Regular e VIP, saldo de pontos de fidelidade e histórico.
