@@ -1,3 +1,7 @@
+package br.com.planilhacerta.view;
+
+import br.com.planilhacerta.model.Cliente;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -23,8 +27,10 @@ public class GerenciadorClientes {
         String email = scanner.nextLine();
         System.out.print("Empresa: ");
         String empresa = scanner.nextLine();
+        System.out.print("Cliente VIP? (s/n): ");
+        boolean vip = scanner.nextLine().trim().equalsIgnoreCase("s");
 
-        clientes.add(new Cliente(id, nome, email, empresa));
+        clientes.add(new Cliente(id, nome, email, empresa, vip));
         System.out.println("-> Cliente cadastrado com sucesso!");
     }
 

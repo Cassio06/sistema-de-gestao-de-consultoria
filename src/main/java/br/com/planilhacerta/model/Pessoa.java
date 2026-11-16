@@ -1,3 +1,5 @@
+package br.com.planilhacerta.model;
+
 public abstract class Pessoa {
     private String id;
     private String nome;

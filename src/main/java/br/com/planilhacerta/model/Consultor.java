@@ -1,3 +1,5 @@
+package br.com.planilhacerta.model;
+
 public class Consultor extends Pessoa {
     private String especialidade;
 
@@ -11,7 +13,7 @@ public class Consultor extends Pessoa {
 
     @Override
     public void exibirDetalhes() {
-        System.out.println("[Consultor] ID: " + getId() + " | Nome: " + getNome() + 
-                           " | E-mail: " + getEmail() + " | Especialidade: " + especialidade);
+        System.out.println("[Consultor] ID: " + getId() + " | Nome: " + getNome()
+                + " | E-mail: " + getEmail() + " | Especialidade: " + especialidade);
     }
 }

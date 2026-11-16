@@ -1,3 +1,7 @@
+package br.com.planilhacerta.view;
+
+import br.com.planilhacerta.model.Consultor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;

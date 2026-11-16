@@ -16,8 +16,8 @@ O objetivo deste sistema é gerenciar o cadastro de clientes, consultores, contr
 
 ## Status do Projeto
 
-🚧 **Em fase de estruturação e modelagem (Esqueleto do Projeto).**  
-A arquitetura de diretórios, documentação de requisitos e modelagem inicial estão definidas. A implementação do código-fonte em Java será realizada nas próximas etapas.
+🚧 **Implementação em andamento.**
+O menu de cadastro de clientes/consultores e os módulos de faturamento, fidelidade e recomendação estão em `src/main/java`. O projeto está organizado por pacotes e pode ser iniciado/testado com `run.ps1`. Contratos/projetos completos, persistência e integração entre todas as funcionalidades ainda estão pendentes.
 
 ---
 
@@ -80,19 +80,19 @@ biblioteca-poo/
 ├── docs/                                    # Documentação de arquitetura e relatório acadêmico
 │   ├── MODELAGEM.md                         # Esqueleto da arquitetura, pacotes e classes POO
 │   └── RELATORIO_TEMPLATE.md                # Estrutura base para o Relatório Final (P2)
-├── src/                                     # Diretório de código-fonte (esqueleto de pacotes)
+├── src/                                     # Código-fonte Java
 │   ├── main/java/br/com/planilhacerta/
+│   │   ├── integration/                     # Interfaces para integração entre módulos
 │   │   ├── model/                           # Entidades de domínio e enums
 │   │   ├── repository/                      # Persistência em arquivos (CSV/JSON/TXT)
 │   │   ├── service/                         # Regras de negócio (alocação, faturamento, fidelidade)
-│   │   ├── view/                            # Interface com o usuário (Console / Desktop / Web)
+│   │   ├── view/                            # Menu e gerenciadores do console
 │   │   └── util/                            # Utilitários, validadores, gerador de PDF e exceções
-│   └── test/java/br/com/planilhacerta/      # Testes unitários e de integração planejados
+│   └── test/java/br/com/planilhacerta/      # Testes executáveis das regras
 ├── .env.example                             # Exemplo de variáveis de ambiente (ex.: integração Google Drive)
 ├── .gitignore                               # Arquivos ignorados pelo Git
+├── run.ps1                                  # Compila e inicia o menu ou executa os testes
 ├── README.md                                # Documentação principal do projeto
-├── S10a - Gestão de Consultoria.docx.pdf    # Enunciado específico da equipe (Planilha Certa)
-└── Trabalho P2.pdf                          # Diretrizes gerais e critérios de avaliação da P2
 ```
 
 ---
@@ -109,22 +109,20 @@ biblioteca-poo/
 
 ## Como Executar
 
-> ⚠️ *O código-fonte ainda não foi implementado. As instruções abaixo representam o fluxo previsto quando o desenvolvimento for iniciado.*
-
 1. **Pré-requisitos:**
    - Java JDK instalado (versão a confirmar pelo grupo; sugestão: 17 ou superior).
    - Git instalado.
 2. **Configuração de ambiente (opcional):**
    - Copie o arquivo `.env.example` para `.env` caso utilize credenciais externas (como API do Google Drive).
-3. **Compilação e execução (prevista):**
-   ```bash
-   # Compilar os arquivos Java (quando implementados)
-   javac -d out $(find src/main/java -name "*.java")
-
-   # Executar a aplicação principal
-   java -cp out br.com.planilhacerta.Main
+3. **Iniciar o menu (PowerShell, JDK 17+):**
+   ```powershell
+   .\run.ps1
    ```
-   *(Caso o grupo adote Maven ou Gradle na etapa de codificação, os comandos `mvn compile exec:java` ou `./gradlew run` serão atualizados nesta seção).*
+4. **Executar os testes do módulo:**
+   ```powershell
+   .\run.ps1 -Test
+   ```
+   O script compila os arquivos em `src/main/java` e grava as classes geradas em `out/`, que é ignorada pelo Git.
 
 ---
 

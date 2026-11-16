@@ -1,7 +1,5 @@
-# Pacote de Testes (`src/test/java/br/com/planilhacerta`)
+# Testes (`src/test/java/br/com/planilhacerta`)
 
-Espaço reservado para os testes das regras de negócio:
-- Alocação automática de consultores e prioridade VIP.
-- Cálculo de progresso de projetos e transição de etapas para status `ATRASADA`.
-- Cálculo de faturas e descontos cumulativos (VIP 10% e Fidelidade 5% a 15%).
-- Recomendações de serviços não contratados.
+`RegrasFaturamentoFidelidadeRecomendacaoTest` cobre cobrança por etapa e entrega final, validação de conclusão, detalhamento, descontos VIP e fidelidade, acumulação e resgate de pontos, prevenção de cobranças/pagamentos duplicados e recomendações para o histórico e os relatórios VIP.
+
+Os testes usam apenas a biblioteca padrão do Java e são executados com os comandos PowerShell no `README.md` da raiz.

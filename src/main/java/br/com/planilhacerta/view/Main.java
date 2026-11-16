@@ -1,3 +1,5 @@
+package br.com.planilhacerta.view;
+
 import java.util.Scanner;
 
 public class Main {
@@ -9,7 +11,7 @@ public class Main {
             int opcao;
 
             do {
-                System.out.println("\n--- MENU DE TESTE ---");
+                System.out.println("\n--- PLANILHA CERTA ---");
                 System.out.println("1. Cadastrar Cliente");
                 System.out.println("2. Listar Clientes");
                 System.out.println("3. Editar Cliente");
@@ -42,6 +44,6 @@ public class Main {
                     default -> System.out.println("Opção inválida! Tente novamente.");
                 }
             } while (opcao != 0);
-            }
+        }
     }
 }
