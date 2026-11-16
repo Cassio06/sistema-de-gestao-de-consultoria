@@ -1,6 +1,6 @@
 # Modelagem e Arquitetura Planejada — Sistema de Gestão de Consultoria
 
-Este documento descreve a arquitetura e a modelagem orientada a objetos planejadas para o **Sistema de Gestão de Consultoria** da empresa fictícia **Planilha Certa**. O projeto segue o [enunciado S10a](../S10a%20-%20Gest%C3%A3o%20de%20Consultoria.docx.pdf) e as [diretrizes do Trabalho da P2](../Trabalho%20P2.pdf).
+Este documento descreve a arquitetura e a modelagem orientada a objetos planejadas para o **Sistema de Gestão de Consultoria**. O projeto segue o [enunciado S10a](../S10a%20-%20Gest%C3%A3o%20de%20Consultoria.docx.pdf) e as [diretrizes do Trabalho da P2](../Trabalho%20P2.pdf).
 
 ---
 
