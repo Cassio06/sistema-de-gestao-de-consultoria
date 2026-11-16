@@ -1,8 +1,8 @@
-# Planilha Certa — Sistema de Gestão de Consultoria (POO)
+# Sistema de Gestão de Consultoria
 
-Sistema de gerenciamento de consultoria empresarial em Java, desenvolvido como projeto acadêmico da disciplina de **Programação Orientada a Objetos** (Trabalho da P2) do **iCEV — Instituto de Ensino Superior**.
+Projeto acadêmico em Java para gerenciar clientes, consultores, contratos, projetos, faturamento e fidelidade da empresa fictícia **Planilha Certa**. Desenvolvido para a disciplina de **Programação Orientada a Objetos** (Trabalho da P2) do **iCEV — Instituto de Ensino Superior**.
 
-> **Nota sobre o repositório:** O projeto foi inicialmente esboçado com o tema genérico de Biblioteca e atualizado para atender ao enunciado oficial sorteado/atribuído à equipe: **S10a — Gestão de Consultoria ("Planilha Certa")**.
+O tema atribuído à equipe está no [enunciado S10a — Gestão de Consultoria](S10a%20-%20Gest%C3%A3o%20de%20Consultoria.docx.pdf).
 
 ---
 
@@ -74,7 +74,7 @@ Detalhes adicionais sobre os pacotes e classes planejados encontram-se em [`docs
 ## Estrutura do Repositório
 
 ```text
-biblioteca-poo/
+sistema-de-gestao-de-consultoria/
 ├── data/                                    # Arquivos de persistência (CSV/JSON/TXT)
 │   └── README.md
 ├── docs/                                    # Documentação de arquitetura e relatório acadêmico
@@ -83,13 +83,20 @@ biblioteca-poo/
 ├── src/                                     # Diretório de código-fonte (esqueleto de pacotes)
 │   ├── main/java/br/com/planilhacerta/
 │   │   ├── model/                           # Entidades de domínio e enums
+│   │   │   └── README.md
 │   │   ├── repository/                      # Persistência em arquivos (CSV/JSON/TXT)
+│   │   │   └── README.md
 │   │   ├── service/                         # Regras de negócio (alocação, faturamento, fidelidade)
-│   │   ├── view/                            # Interface com o usuário (Console / Desktop / Web)
-│   │   └── util/                            # Utilitários, validadores, gerador de PDF e exceções
-│   └── test/java/br/com/planilhacerta/      # Testes unitários e de integração planejados
+│   │   │   └── README.md
+│   │   ├── util/                            # Utilitários, validadores, gerador de PDF e exceções
+│   │   │   └── README.md
+│   │   └── view/                            # Interface com o usuário (Console / Desktop / Web)
+│   │       └── README.md
+│   └── test/java/br/com/planilhacerta/       # Testes unitários e de integração planejados
+│       └── README.md
 ├── .env.example                             # Exemplo de variáveis de ambiente (ex.: integração Google Drive)
 ├── .gitignore                               # Arquivos ignorados pelo Git
+├── ESCOPO_LUKAS.md
 ├── README.md                                # Documentação principal do projeto
 ├── S10a - Gestão de Consultoria.docx.pdf    # Enunciado específico da equipe (Planilha Certa)
 └── Trabalho P2.pdf                          # Diretrizes gerais e critérios de avaliação da P2
@@ -114,9 +121,14 @@ biblioteca-poo/
 1. **Pré-requisitos:**
    - Java JDK instalado (versão a confirmar pelo grupo; sugestão: 17 ou superior).
    - Git instalado.
-2. **Configuração de ambiente (opcional):**
+2. **Clone o repositório e entre na pasta do projeto.**
+   ```bash
+   git clone https://github.com/Cassio06/sistema-de-gestao-de-consultoria.git
+   cd sistema-de-gestao-de-consultoria
+   ```
+3. **Configuração de ambiente (opcional):**
    - Copie o arquivo `.env.example` para `.env` caso utilize credenciais externas (como API do Google Drive).
-3. **Compilação e execução (prevista):**
+4. **Compilação e execução (prevista):**
    ```bash
    # Compilar os arquivos Java (quando implementados)
    javac -d out $(find src/main/java -name "*.java")
@@ -172,4 +184,4 @@ O desenvolvimento está organizado em branches individuais a partir da `main`, g
 
 Código · Abstrações OO · Completude e Corretude Funcional · Tratamento de Erros · Diferencial do Projeto · Avaliação Individual · Trabalho em Grupo · Defesa Oral.
 
-Critérios detalhados no edital: estrutura e design do código (modularidade, coesão, acoplamento), implementação dos requisitos funcionais, funcionalidades adicionais e criatividade, qualidade do código e boas práticas (nomenclatura, comentários, **testes**, padrões) e tratamento de erros.
+O [edital da P2](Trabalho%20P2.pdf) detalha os critérios de estrutura e design do código (modularidade, coesão, acoplamento), implementação dos requisitos funcionais, funcionalidades adicionais e criatividade, qualidade do código e boas práticas (nomenclatura, comentários, **testes**, padrões) e tratamento de erros.
