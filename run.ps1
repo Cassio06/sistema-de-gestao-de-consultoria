@@ -26,7 +26,6 @@ New-Item -ItemType Directory -Force -Path $outputPath | Out-Null
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
-
 if ($Test) {
     & java -cp $outputPath br.com.planilhacerta.RegrasFaturamentoFidelidadeRecomendacaoTest
 } else {

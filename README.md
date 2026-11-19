@@ -17,7 +17,7 @@ O objetivo deste sistema é gerenciar o cadastro de clientes, consultores, contr
 ## Status do Projeto
 
 🚧 **Implementação em andamento.**
-O menu de cadastro de clientes/consultores e os módulos de faturamento, fidelidade e recomendação estão em `src/main/java`. O projeto está organizado por pacotes e pode ser iniciado/testado com `run.ps1`. Contratos/projetos completos, persistência e integração entre todas as funcionalidades ainda estão pendentes.
+O menu de cadastro de clientes/consultores e os serviços de faturamento, fidelidade e recomendação estão implementados em `src/main/java`, com testes executáveis por `run.ps1 -Test`. As opções 9 a 15 do menu permitem criar contratos com etapas, concluir etapas, emitir e pagar faturas, consultar fidelidade e ver recomendações. Até a integração com os modelos definitivos da equipe, o menu usa adaptadores provisórios em memória. Persistência e geração de relatórios PDF permanecem pendentes.
 
 ---
 
@@ -40,6 +40,8 @@ O menu de cadastro de clientes/consultores e os módulos de faturamento, fidelid
 ### 4. Pagamentos e Faturamento
 - **Modalidades de pagamento:** pagamento realizado por etapa concluída ou na entrega final, conforme estipulado no contrato.
 - **Faturas detalhadas:** emissão de faturas com aplicação automática de **10% de desconto** para clientes VIP.
+- **Implementação atual:** `FaturamentoService` registra o pagamento integral da fatura; `FidelidadeService` credita pontos somente após esse registro. O desconto VIP é calculado primeiro e o desconto de fidelidade incide sobre o valor restante. No faturamento por etapa, o desconto de fidelidade reservado ao contrato é aplicado às etapas cobradas, sem resgatar os mesmos pontos mais de uma vez.
+- **Uso no menu:** cadastre o cliente, escolha **9** para criar contrato e etapas, **11** para concluir uma etapa e **12** para emitir a fatura. A opção **13** lista faturas e permite registrar pagamentos pendentes; **14** e **15** consultam fidelidade e recomendações. Os dados ficam em memória e são perdidos ao encerrar o programa.
 
 ### 5. Programa de Fidelidade e Retenção de Clientes
 - **Acúmulo de pontos:** 1 ponto a cada **R$ 100,00** pagos.
@@ -99,10 +101,11 @@ biblioteca-poo/
 
 ## Tecnologias e Decisões Técnicas
 
-- **Linguagem:** Java. *(Versão do JDK a ser definida pelo grupo — sugestão: JDK 17 LTS ou superior. O edital não exige versão específica.)*
+- **Linguagem:** Java 17 ou superior (`run.ps1` compila com `javac --release 17`).
+- **Bibliotecas:** os módulos implementados usam somente a biblioteca padrão do Java; não há dependências externas de persistência ou geração de PDF configuradas no projeto até o momento.
 - **Persistência:** Arquivos locais (`CSV`, `JSON` ou `TXT`) armazenados no diretório [`data/`](data/).
   - *Desafio extra opcional:* sincronização/armazenamento dos arquivos de dados no Google Drive.
-- **Relatórios:** Saída formatada no console e recomendação de uso da biblioteca **iText** para exportação em PDF.
+- **Relatórios:** a exportação em PDF ainda não foi implementada; iText é apenas uma possibilidade futura, não uma dependência usada pelo projeto.
 - **Interface:** Console interativo (ou Desktop/Web simples), priorizando clareza de fluxo e validação de entradas.
 
 ---

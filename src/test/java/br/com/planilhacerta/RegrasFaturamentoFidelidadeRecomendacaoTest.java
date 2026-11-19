@@ -11,8 +11,14 @@ import br.com.planilhacerta.model.Cliente;
 import br.com.planilhacerta.service.FaturamentoService;
 import br.com.planilhacerta.service.FidelidadeService;
 import br.com.planilhacerta.service.RecomendacaoService;
+import br.com.planilhacerta.view.Main;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +30,11 @@ public class RegrasFaturamentoFidelidadeRecomendacaoTest {
         testaFaturamentoPorEtapaEDuplicidade();
         testaFaturamentoFinal();
         testaDescontosVipEFidelidade();
+        testaDescontoDeFidelidadeDistribuidoEntreEtapas();
         testaAcumuloDePontosEResgateComTeto();
         testaClienteDoMenuIntegradoAoProgramaDeFidelidade();
         testaRecomendacoesParaHistoricoERelatorioVip();
+        testaFluxoDeFaturamentoNoMenu();
         System.out.println("Todos os testes de faturamento, fidelidade e recomendação passaram.");
     }
 
@@ -137,6 +145,33 @@ public class RegrasFaturamentoFidelidadeRecomendacaoTest {
                 "Pontos pagos devem conceder desconto ao próximo contrato");
     }
 
+    private static void testaDescontoDeFidelidadeDistribuidoEntreEtapas() {
+        ClienteFake cliente = new ClienteFake("cliente-vip-etapas", true);
+        cliente.pontos = 100;
+        EtapaFake primeira = new EtapaFake("vip-etapa-1", "Diagnóstico", "200.00", true);
+        EtapaFake segunda = new EtapaFake("vip-etapa-2", "Implementação", "300.00", true);
+        ContratoFake contrato = contrato("contrato-vip-etapas", cliente, ModalidadePagamento.POR_ETAPA,
+                Especializacao.GESTAO, primeira, segunda);
+        FaturamentoService service = new FaturamentoService();
+
+        Fatura faturaPrimeira = service.gerarFaturaPorEtapa(contrato, primeira.id, HOJE);
+        verificar(faturaPrimeira.getDescontoVip().compareTo(new BigDecimal("20.00")) == 0,
+                "O desconto VIP deve ser aplicado ao valor da primeira etapa");
+        verificar(faturaPrimeira.getDescontoFidelidade().compareTo(new BigDecimal("9.00")) == 0,
+                "A fidelidade deve incidir após o desconto VIP na primeira etapa");
+        verificar(cliente.pontos == 0, "Os pontos devem ser resgatados uma única vez no contrato");
+
+        Fatura faturaSegunda = service.gerarFaturaPorEtapa(contrato, segunda.id, HOJE);
+        verificar(faturaSegunda.getDescontoVip().compareTo(new BigDecimal("30.00")) == 0,
+                "O desconto VIP deve ser aplicado ao valor da segunda etapa");
+        verificar(faturaSegunda.getDescontoFidelidade().compareTo(new BigDecimal("13.50")) == 0,
+                "O desconto de fidelidade reservado deve continuar nas etapas do contrato");
+        verificar(faturaPrimeira.getDescontoFidelidade().add(faturaSegunda.getDescontoFidelidade())
+                        .compareTo(new BigDecimal("22.50")) == 0,
+                "O desconto fidelidade total deve corresponder a 5% do contrato após o VIP");
+        verificar(cliente.pontos == 0, "A segunda etapa não deve resgatar os mesmos pontos novamente");
+    }
+
     private static void testaRecomendacoesParaHistoricoERelatorioVip() {
         ClienteFake vip = new ClienteFake("historico-vip", true);
         ClienteFake outroCliente = new ClienteFake("outro-cliente", false);
@@ -168,6 +203,38 @@ public class RegrasFaturamentoFidelidadeRecomendacaoTest {
                 "O cliente cadastrado deve acumular pontos pelas faturas pagas");
         verificar(cliente.getValorPagoRestanteParaPonto().compareTo(new BigDecimal("50.00")) == 0,
                 "O saldo parcial para o próximo ponto deve permanecer no cliente");
+    }
+
+    private static void testaFluxoDeFaturamentoNoMenu() {
+        String entrada = String.join("\n",
+                "1", "cliente-menu-vip", "Cliente VIP", "vip@example.com", "Empresa", "s",
+                "9", "cliente-menu-vip", "contrato-menu", "1", "1", "1",
+                "etapa-menu", "Diagnóstico", "200.00",
+                "11", "contrato-menu", "etapa-menu",
+                "12", "contrato-menu", "etapa-menu", "s",
+                "15", "cliente-menu-vip",
+                "0", "");
+        ByteArrayOutputStream saida = new ByteArrayOutputStream();
+        InputStream entradaOriginal = System.in;
+        PrintStream saidaOriginal = System.out;
+        try {
+            System.setIn(new ByteArrayInputStream(entrada.getBytes(StandardCharsets.UTF_8)));
+            System.setOut(new PrintStream(saida, true, StandardCharsets.UTF_8));
+            Main.main(new String[0]);
+        } finally {
+            System.setIn(entradaOriginal);
+            System.setOut(saidaOriginal);
+        }
+
+        String resultado = saida.toString(StandardCharsets.UTF_8);
+        verificar(resultado.contains("9. Criar contrato com projeto e etapas"),
+                "O menu deve expor a criação de contratos");
+        verificar(resultado.contains("Total: R$ 180.00"),
+                "O menu deve exibir a fatura com o desconto VIP aplicado");
+        verificar(resultado.contains("Pontos creditados: 1"),
+                "O menu deve creditar pontos após o pagamento");
+        verificar(resultado.contains("Especializações recomendadas: [GESTAO, TI]"),
+                "O menu deve consultar recomendações para cliente VIP");
     }
 
     private static ContratoFake contrato(String id, ClienteFake cliente, ModalidadePagamento modalidade,

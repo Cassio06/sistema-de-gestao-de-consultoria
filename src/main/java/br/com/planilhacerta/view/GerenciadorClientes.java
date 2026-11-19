@@ -87,6 +87,10 @@ public class GerenciadorClientes {
         }
         return null;
     }
+
+    public List<Cliente> getClientes() {
+        return List.copyOf(clientes);
+    }
 }
 
 

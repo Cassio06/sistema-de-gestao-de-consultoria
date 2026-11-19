@@ -39,6 +39,12 @@
 | **Cezar Gabriel de Souza Vicente Mendes** | `Cezar` | **Faturamento, Fidelidade e Recomendações:** Pagamento por etapa concluída ou entrega final e emissão de faturas detalhadas (10% de desconto automático para VIP); programa de fidelidade (1 ponto a cada R$ 100 pagos, 100 pontos = 5% de desconto até 15%); recomendação de especializações ainda não contratadas. |
 | **Lukas Souza Melo** | `Lukas` | **Persistência, Relatórios PDF e Interface/Erros:** Persistência de dados em arquivos (JSON, CSV ou TXT) e tentativa do desafio Google Drive; emissão de relatórios de desempenho (console e PDF com iText, incluindo recomendações para VIP); menu/interface principal e tratamento de erros. |
 
+### Relato individual — Cezar (rascunho para revisar antes da entrega)
+
+> Ajuste este texto para refletir sua experiência pessoal. Os itens entre colchetes não podem ser confirmados pelo código.
+
+Implementei os serviços de faturamento, fidelidade e recomendação, os modelos de fatura e pagamento e os testes dessas regras. Para integrar os módulos sem depender das classes concretas de contrato, projeto e etapa, usei interfaces de integração. Uma dificuldade técnica foi garantir que cobranças e pagamentos duplicados não gerassem registros repetidos; tratei cada cobrança com uma chave própria e cobri o comportamento com testes. Também usei `BigDecimal` para valores monetários e preservei no cliente o valor pago que ainda não completou R$ 100. Aprendi a separar regras de negócio das entidades concretas e a validar as regras com testes automatizados. O que mais gostei de implementar foi **[descrever uma parte que realmente gostou]**. Outra dificuldade que enfrentei foi **[descrever uma dificuldade pessoal e como a resolveu]**.
+
 ---
 
 ## 4. Estrutura do Código e Decisões de Design OO (Seção 6.2)
@@ -60,32 +66,34 @@
 ## 5. Funcionalidades Implementadas e Pendentes (Seção 8)
 
 ### 5.1 Funcionalidades Concluídas
-- [ ] Cadastro de clientes (`Regular`/`VIP`), consultores (`Financeiro`, `Gestão`, `TI`) e contratos.
+- [ ] Cadastro de clientes (`Regular`/`VIP`), consultores (`Financeiro`, `Gestão`, `TI`) e contratos. *(Confirmar com os responsáveis pelos módulos.)*
 - [ ] Alocação automática de consultores (menor carga, máx. 3 projetos ativos, prioridade VIP).
 - [ ] Gerenciamento de projetos em etapas com prazos, valores, detecção de atraso e cálculo de progresso.
 - [ ] Emissão de relatórios de desempenho (com seção extra de recomendações para clientes VIP).
-- [ ] Faturamento por etapa ou entrega final com desconto automático de 10% para VIPs.
-- [ ] Programa de fidelidade (1 ponto a cada R$ 100 pagos; 5% de desconto a cada 100 pontos até 15%) e recomendação de especializações não contratadas.
+- [x] Faturamento por etapa concluída ou entrega final, com fatura detalhada, desconto VIP de 10% e registro do pagamento integral.
+- [x] Fidelidade (1 ponto por R$ 100 pagos, saldo parcial carregado, desconto de 5% por 100 pontos até 15%) e recomendações de especializações ausentes do histórico.
 - [ ] Persistência em arquivos (`CSV` / `JSON` / `TXT`) e tratamento de erros.
 
 ### 5.2 Funcionalidades Não Concluídas e Justificativa
-- *(Caso alguma funcionalidade ou o desafio extra do Google Drive não tenha sido concluído, descrever qual foi e o motivo técnico ou de tempo).*
+
+- Os serviços de faturamento, fidelidade e recomendação estão implementados e cobertos por testes. O menu já permite demonstrá-los com adaptadores provisórios em memória; a substituição pelos modelos definitivos de contrato, projeto e etapa deve ser confirmada após a junção dos módulos.
+- A persistência em arquivos e a geração de relatórios PDF não estão configuradas no código-fonte atual. O desafio de integração com o Google Drive deve ser marcado como não realizado, salvo confirmação de outra implementação da equipe.
 
 ---
 
 ## 6. Experiência do Grupo, Desafios e Soluções (Seções 6.4 e 8)
 
-- **Principais dificuldades enfrentadas:** *(Relatar problemas encontrados durante a modelagem, persistência em arquivos, controle de datas/prazos ou integração).*
-- **Soluções adotadas:** *(Como a equipe contornou cada desafio).*
-- **Aprendizados e experiência individual/coletiva:** *(O que o grupo mais gostou de implementar e o quanto aprendeu).*
+- **Integração entre módulos:** contrato, projeto e etapa pertencem a partes diferentes do trabalho. Os serviços usam `ClienteIntegracao`, `ContratoIntegracao`, `ProjetoIntegracao` e `EtapaIntegracao`, reduzindo dependência de implementações concretas; a equipe ainda precisa validar os contratos de interface ao juntar as branches.
+- **Precisão financeira e fidelidade:** valores monetários e arredondamento são tratados com `BigDecimal`; o cliente mantém o valor pago restante para completar um ponto. Os pontos só são creditados após o pagamento registrado, e testes verificam o resgate e o saldo parcial.
+- **Cobranças repetidas:** chaves por contrato/etapa ou contrato/entrega e verificações de pagamento impedem duplicidades; testes cobrem esses casos.
+- **Aprendizados e experiência individual/coletiva:** cada integrante deve acrescentar o que realmente gostou e aprendeu. O relato de Cezar acima é um rascunho técnico, não substitui a revisão pessoal.
 
 ---
 
 ## 7. Bibliotecas Utilizadas e Motivo das Escolhas (Seção 8)
 
-- **Java Standard Library (`java.time`, `java.nio.file`, `java.math`):** manipulação precisa de prazos (`LocalDate`), valores monetários (`BigDecimal`) e leitura/escrita de arquivos.
-- **Biblioteca de Persistência (ex.: Gson / Jackson / OpenCSV):** *(Justificar a escolha quando definida).*
-- **Biblioteca de Relatórios PDF (ex.: iText):** *(Recomendada no edital da P2 para exportação de relatórios em PDF).*
+- **Java Standard Library (JDK 17):** `java.math.BigDecimal` e `RoundingMode` para valores e arredondamento monetário; `java.time.LocalDate` para datas; `java.util` para coleções, identificadores e entrada no console. Os testes também usam apenas a biblioteca padrão e são executados por um programa Java, sem JUnit.
+- **Dependências externas:** não há Gson, Jackson, OpenCSV, iText ou outra biblioteca externa configurada ou usada nos fontes atuais. Persistência e exportação para PDF ainda não estão implementadas; portanto, não devem ser apresentadas como bibliotecas utilizadas.
 
 ---
 
@@ -97,4 +105,7 @@
 
 ## 9. Referências Consultadas (Seção 8)
 
-- *(Listar links da documentação oficial do Java, tutoriais, fóruns, issues e materiais de aula consultados durante o desenvolvimento).*
+- Oracle. *Java SE 17 API — BigDecimal*. https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html
+- Oracle. *Java SE 17 API — LocalDate*. https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/LocalDate.html
+- Oracle. *Java SE 17 API — Collections Framework*. https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/package-summary.html
+- **Materiais da disciplina e outras fontes efetivamente consultadas:** [adicionar título, autor/instituição e URL; não listar fontes que não foram usadas].

@@ -7,7 +7,8 @@ public class Main {
         try (Scanner scanner = new Scanner(System.in)) {
             GerenciadorClientes gerClientes = new GerenciadorClientes(scanner);
             GerenciadorConsultores gerConsultores = new GerenciadorConsultores(scanner);
-        
+            GerenciadorFaturamento gerFaturamento = new GerenciadorFaturamento(scanner, gerClientes);
+
             int opcao;
 
             do {
@@ -21,6 +22,14 @@ public class Main {
                 System.out.println("6. Listar Consultores");
                 System.out.println("7. Editar Consultor");
                 System.out.println("8. Remover Consultor");
+                System.out.println("-----------------------------------");
+                System.out.println("9. Criar contrato com projeto e etapas");
+                System.out.println("10. Listar contratos");
+                System.out.println("11. Marcar etapa como concluída");
+                System.out.println("12. Emitir fatura");
+                System.out.println("13. Listar faturas / registrar pagamento");
+                System.out.println("14. Consultar fidelidade");
+                System.out.println("15. Consultar recomendações");
                 System.out.println("-----------------------------------");
                 System.out.println("0. Sair");
                 System.out.print("Escolha uma opção: ");
@@ -40,7 +49,14 @@ public class Main {
                     case 6 -> gerConsultores.listar();
                     case 7 -> gerConsultores.editar();
                     case 8 -> gerConsultores.remover();
-                    case 0 -> System.out.println("Encerrando testes...");
+                    case 9 -> gerFaturamento.criarContrato();
+                    case 10 -> gerFaturamento.listarContratos();
+                    case 11 -> gerFaturamento.concluirEtapa();
+                    case 12 -> gerFaturamento.emitirFatura();
+                    case 13 -> gerFaturamento.listarFaturas();
+                    case 14 -> gerFaturamento.consultarFidelidade();
+                    case 15 -> gerFaturamento.consultarRecomendacoes();
+                    case 0 -> System.out.println("Encerrando sistema...");
                     default -> System.out.println("Opção inválida! Tente novamente.");
                 }
             } while (opcao != 0);
