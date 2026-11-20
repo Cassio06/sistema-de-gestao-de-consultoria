@@ -44,4 +44,5 @@ O sistema valida os vínculos ao salvar e carregar. O JSON integrado está em `d
 - [Enunciado S10a](docs/enunciados/S10a%20-%20Gest%C3%A3o%20de%20Consultoria.docx.pdf)
 - [Trabalho P2](docs/enunciados/Trabalho%20P2.pdf)
 - [Arquitetura](docs/ARQUITETURA.md)
-- [Roteiro do relatório coletivo](docs/RELATORIO_TEMPLATE.md)
+- [Relatório da P2 em PDF](docs/RELATORIO_FINAL_P2.pdf)
+- [Texto editável do relatório](docs/RELATORIO_P2.md)

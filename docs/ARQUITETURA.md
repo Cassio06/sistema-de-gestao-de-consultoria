@@ -9,3 +9,5 @@ O JAR executa `br.com.planilhacerta.app.Main`. O menu trata entradas, delega ope
 - `RelatoriosIntegrados` adapta os dados para os formatos de console, CSV e PDF com iText.
 
 Os testes JUnit verificam os serviços e os fluxos integrados. O script Windows `run.ps1 -Test` também executa os roteiros de regressão que vieram das branches.
+
+Os menus isolados usados pelos roteiros de regressão ficam em `src/test/java` e são executados pelo script de testes. O JAR abre o menu integrado.
