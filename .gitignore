@@ -19,7 +19,7 @@ target/
 hs_err_pid*
 replay_pid*
 
-# Environment variables & secrets (keep .env.example)
+# Environment variables & secrets
 .env
 *.pem
 credentials.json
