@@ -1,0 +1,68 @@
+package br.com.planilhacerta.view;
+
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in)) {
+            GerenciadorClientes gerClientes = new GerenciadorClientes(scanner);
+            GerenciadorConsultores gerConsultores = new GerenciadorConsultores(scanner);
+            GerenciadorFaturamento gerFaturamento = new GerenciadorFaturamento(scanner, gerClientes);
+            gerClientes.definirVerificadorDeContratoAtivo(gerFaturamento::possuiContratoAtivo);
+
+            int opcao;
+
+            do {
+                System.out.println("\n--- PLANILHA CERTA ---");
+                System.out.println("1. Cadastrar Cliente");
+                System.out.println("2. Listar Clientes");
+                System.out.println("3. Editar Cliente");
+                System.out.println("4. Remover Cliente");
+                System.out.println("-----------------------------------");
+                System.out.println("5. Cadastrar Consultor");
+                System.out.println("6. Listar Consultores");
+                System.out.println("7. Editar Consultor");
+                System.out.println("8. Remover Consultor");
+                System.out.println("-----------------------------------");
+                System.out.println("9. Criar contrato com projeto e etapas");
+                System.out.println("10. Listar contratos");
+                System.out.println("11. Marcar etapa como concluída");
+                System.out.println("12. Emitir fatura");
+                System.out.println("13. Listar faturas / registrar pagamento");
+                System.out.println("14. Consultar fidelidade");
+                System.out.println("15. Consultar recomendações");
+                System.out.println("-----------------------------------");
+                System.out.println("0. Sair");
+                System.out.print("Escolha uma opção: ");
+
+                try {
+                    opcao = Integer.parseInt(EntradaConsole.lerLinha(scanner));
+                } catch (NumberFormatException e) {
+                    opcao = -1;
+                }
+
+                switch (opcao) {
+                    case 1 -> gerClientes.cadastrar();
+                    case 2 -> gerClientes.listar();
+                    case 3 -> gerClientes.editar();
+                    case 4 -> gerClientes.remover();
+                    case 5 -> gerConsultores.cadastrar();
+                    case 6 -> gerConsultores.listar();
+                    case 7 -> gerConsultores.editar();
+                    case 8 -> gerConsultores.remover();
+                    case 9 -> gerFaturamento.criarContrato();
+                    case 10 -> gerFaturamento.listarContratos();
+                    case 11 -> gerFaturamento.concluirEtapa();
+                    case 12 -> gerFaturamento.emitirFatura();
+                    case 13 -> gerFaturamento.listarFaturas();
+                    case 14 -> gerFaturamento.consultarFidelidade();
+                    case 15 -> gerFaturamento.consultarRecomendacoes();
+                    case 0 -> System.out.println("Encerrando sistema...");
+                    default -> System.out.println("Opção inválida! Tente novamente.");
+                }
+            } while (opcao != 0);
+        } catch (EntradaConsole.Encerrada erro) {
+            System.out.println("\nEntrada encerrada. Finalizando sistema.");
+        }
+    }
+}
