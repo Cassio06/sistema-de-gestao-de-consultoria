@@ -6,11 +6,10 @@ Projeto acadêmico de Programação Orientada a Objetos do iCEV, tema S10a.
 
 Use JDK 17 ou superior. A primeira compilação baixa o Maven e as dependências pela rede.
 
-No Windows:
+No Windows, execute pelo PowerShell. O script compila o projeto e abre o menu com saída UTF-8.
 
 ```powershell
-.\mvnw.cmd clean verify
-java -jar target/planilha-certa.jar
+.\run.ps1
 ```
 
 No Linux ou macOS:
