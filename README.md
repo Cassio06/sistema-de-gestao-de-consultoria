@@ -1,14 +1,14 @@
-# Planilha Certa — Sistema de Gestão de Consultoria (POO)
+# Sistema de Gestão de Consultoria
 
-Sistema de gerenciamento de consultoria empresarial em Java, desenvolvido como projeto acadêmico da disciplina de **Programação Orientada a Objetos** (Trabalho da P2) do **iCEV — Instituto de Ensino Superior**.
+Projeto acadêmico em Java para gerenciar clientes, consultores, contratos, projetos, faturamento e fidelidade em uma empresa de consultoria. Desenvolvido para a disciplina de **Programação Orientada a Objetos** (Trabalho da P2) do **iCEV — Instituto de Ensino Superior**.
 
-> **Nota sobre o repositório:** O projeto foi inicialmente esboçado com o tema genérico de Biblioteca e atualizado para atender ao enunciado oficial sorteado/atribuído à equipe: **S10a — Gestão de Consultoria ("Planilha Certa")**.
+O tema atribuído à equipe está no [enunciado S10a — Gestão de Consultoria](S10a%20-%20Gest%C3%A3o%20de%20Consultoria.docx.pdf).
 
 ---
 
 ## Objetivo e Contexto do Problema
 
-A empresa de consultoria **“Planilha Certa”** oferece serviços personalizados de **planejamento financeiro**, **gestão empresarial** e **análise de dados (TI)** para diversos clientes.
+A empresa de consultoria oferece serviços personalizados de **planejamento financeiro**, **gestão empresarial** e **análise de dados (TI)** para diversos clientes.
 
 O objetivo deste sistema é gerenciar o cadastro de clientes, consultores, contratos de consultoria e o controle de projetos e suas etapas. Clientes **VIP** possuem atendimento prioritário, descontos exclusivos e relatórios personalizados com recomendações. Cada projeto é dividido em etapas com prazos e valores específicos, permitindo monitorar o progresso, faturar por etapa ou na entrega final, acumular pontos em um programa de fidelidade e emitir relatórios de desempenho.
 
@@ -76,7 +76,7 @@ Detalhes adicionais sobre os pacotes e classes planejados encontram-se em [`docs
 ## Estrutura do Repositório
 
 ```text
-biblioteca-poo/
+sistema-de-gestao-de-consultoria/
 ├── data/                                    # Arquivos de persistência (CSV/JSON/TXT)
 │   └── README.md
 ├── docs/                                    # Documentação de arquitetura e relatório acadêmico
@@ -86,8 +86,11 @@ biblioteca-poo/
 │   ├── main/java/br/com/planilhacerta/
 │   │   ├── integration/                     # Interfaces para integração entre módulos
 │   │   ├── model/                           # Entidades de domínio e enums
+│   │   │   └── README.md
 │   │   ├── repository/                      # Persistência em arquivos (CSV/JSON/TXT)
+│   │   │   └── README.md
 │   │   ├── service/                         # Regras de negócio (alocação, faturamento, fidelidade)
+<<<<<<< HEAD
 │   │   ├── view/                            # Menu e gerenciadores do console
 │   │   └── util/                            # Utilitários, validadores, gerador de PDF e exceções
 │   └── test/java/br/com/planilhacerta/      # Testes executáveis das regras
@@ -95,6 +98,33 @@ biblioteca-poo/
 ├── .gitignore                               # Arquivos ignorados pelo Git
 ├── run.ps1                                  # Compila e inicia o menu ou executa os testes
 ├── README.md                                # Documentação principal do projeto
+=======
+│   │   │   └── README.md
+│   │   ├── util/                            # Utilitários, validadores, gerador de PDF e exceções
+│   │   │   └── README.md
+│   │   └── view/                            # Interface com o usuário (Console / Desktop / Web)
+│   │       └── README.md
+│   └── test/java/br/com/planilhacerta/       # Testes unitários e de integração planejados
+│       └── README.md
+├── .env.example                             # Exemplo de variáveis de ambiente (ex.: integração Google Drive)
+├── .gitignore                               # Arquivos ignorados pelo Git
+├── Cliente.class
+├── Cliente.java
+├── Consultor.class
+├── Consultor.java
+├── ESCOPO_CEZAR.md
+├── GerenciadorClientes.class
+├── GerenciadorClientes.java
+├── GerenciadorConsultores.class
+├── GerenciadorConsultores.java
+├── Main.java
+├── Pessoa.class
+├── Pessoa.java
+├── main.class
+├── README.md                                # Documentação principal do projeto
+├── S10a - Gestão de Consultoria.docx.pdf    # Enunciado específico da equipe
+└── Trabalho P2.pdf                          # Diretrizes gerais e critérios de avaliação da P2
+>>>>>>> bcb3230c6ca31bbb350c3a51f6951675350f1c08
 ```
 
 ---
@@ -115,11 +145,26 @@ biblioteca-poo/
 1. **Pré-requisitos:**
    - Java JDK instalado (versão a confirmar pelo grupo; sugestão: 17 ou superior).
    - Git instalado.
-2. **Configuração de ambiente (opcional):**
+2. **Clone o repositório e entre na pasta do projeto.**
+   ```bash
+   git clone https://github.com/Cassio06/sistema-de-gestao-de-consultoria.git
+   cd sistema-de-gestao-de-consultoria
+   ```
+3. **Configuração de ambiente (opcional):**
    - Copie o arquivo `.env.example` para `.env` caso utilize credenciais externas (como API do Google Drive).
+<<<<<<< HEAD
 3. **Iniciar o menu (PowerShell, JDK 17+):**
    ```powershell
    .\run.ps1
+=======
+4. **Compilação e execução (prevista):**
+   ```bash
+   # Compilar os arquivos Java (quando implementados)
+   javac -d out $(find src/main/java -name "*.java")
+
+   # Executar a aplicação principal
+   java -cp out br.com.planilhacerta.Main
+>>>>>>> bcb3230c6ca31bbb350c3a51f6951675350f1c08
    ```
 4. **Executar os testes do módulo:**
    ```powershell
@@ -173,4 +218,4 @@ O desenvolvimento está organizado em branches individuais a partir da `main`, g
 
 Código · Abstrações OO · Completude e Corretude Funcional · Tratamento de Erros · Diferencial do Projeto · Avaliação Individual · Trabalho em Grupo · Defesa Oral.
 
-Critérios detalhados no edital: estrutura e design do código (modularidade, coesão, acoplamento), implementação dos requisitos funcionais, funcionalidades adicionais e criatividade, qualidade do código e boas práticas (nomenclatura, comentários, **testes**, padrões) e tratamento de erros.
+O [edital da P2](Trabalho%20P2.pdf) detalha os critérios de estrutura e design do código (modularidade, coesão, acoplamento), implementação dos requisitos funcionais, funcionalidades adicionais e criatividade, qualidade do código e boas práticas (nomenclatura, comentários, **testes**, padrões) e tratamento de erros.

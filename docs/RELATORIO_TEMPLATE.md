@@ -12,7 +12,8 @@
 
 - **Instituição:** iCEV — Instituto de Ensino Superior
 - **Disciplina:** Programação Orientada a Objetos (Trabalho da P2)
-- **Tema atribuído:** S10a — Gestão de Consultoria (“Planilha Certa”)
+- **Projeto:** Sistema de Gestão de Consultoria
+- **Tema atribuído:** [S10a — Gestão de Consultoria](../S10a%20-%20Gest%C3%A3o%20de%20Consultoria.docx.pdf)
 - **Integrantes:**
   - Cezar Gabriel de Souza Vicente Mendes
   - Artur Henrique Da Silva Alencar
@@ -23,7 +24,7 @@
 
 ## 2. Introdução ao Projeto (Seção 6.1)
 
-- **Visão Geral:** Descrição do problema enfrentado pela empresa de consultoria “Planilha Certa” (planejamento financeiro, gestão empresarial e análise de dados/TI), público-alvo e principais funcionalidades do sistema.
+- **Visão Geral:** Descrição do problema enfrentado pela empresa de consultoria (planejamento financeiro, gestão empresarial e análise de dados/TI), público-alvo e principais funcionalidades do sistema.
 - **Fluxo Geral do Sistema:** Como clientes (`Regular` e `VIP`), consultores, contratos, projetos, etapas e faturas interagem do cadastro até a emissão de relatórios e acúmulo de fidelidade.
 
 ---
@@ -99,7 +100,7 @@ Implementei os serviços de faturamento, fidelidade e recomendação, os modelos
 
 ## 8. Conclusão e Melhorias Futuras (Seção 6.5)
 
-- Sugestões de extensões futuras para o sistema da “Planilha Certa” (ex.: interface gráfica web/desktop, notificações automáticas de etapas próximas do vencimento, dashboard financeiro e sincronização em nuvem).
+- Sugestões de extensões futuras para o Sistema de Gestão de Consultoria (ex.: interface gráfica web/desktop, notificações automáticas de etapas próximas do vencimento, dashboard financeiro e sincronização em nuvem).
 
 ---
 
