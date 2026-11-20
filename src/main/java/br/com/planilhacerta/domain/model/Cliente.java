@@ -4,6 +4,7 @@ import br.com.planilhacerta.domain.enums.CategoriaCliente;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class Cliente extends Pessoa {
     private final List<Contrato> historicoContratos = new ArrayList<>();
@@ -16,13 +17,18 @@ public abstract class Cliente extends Pessoa {
 
     public abstract boolean temPrioridadeNaAlocacao();
 
-    public List<Contrato> getHistoricoContratos() {
+    public synchronized List<Contrato> getHistoricoContratos() {
         return List.copyOf(historicoContratos);
     }
 
-    public void registrarContrato(Contrato contrato) {
-        // TODO Cássio: verificar se o contrato pertence a este cliente.
-        // Impedir repetição de identificador antes de adicionar ao histórico.
-        throw new UnsupportedOperationException("Cássio: implementar o vínculo com o histórico.");
+    public synchronized void registrarContrato(Contrato contrato) {
+        Objects.requireNonNull(contrato, "Informe o contrato.");
+        if (contrato.getCliente() != this) {
+            throw new IllegalArgumentException("O contrato pertence a outro cliente.");
+        }
+        if (historicoContratos.stream().anyMatch(item -> item.getId().equals(contrato.getId()))) {
+            throw new IllegalArgumentException("O contrato já consta no histórico do cliente.");
+        }
+        historicoContratos.add(contrato);
     }
 }

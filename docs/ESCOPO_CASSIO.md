@@ -16,7 +16,7 @@ O item 1 de **Requisitos Específicos** do [PDF de Gestão de Consultoria](enunc
 
 O [edital da P2](enunciados/Trabalho%20P2.pdf) também exige aplicação justificada dos quatro pilares de POO, organização do código e tratamento de erros. O trecho inicial sobre horas e tarefas é um **exemplo de enunciado**; as funcionalidades específicas da equipe são as do S10a.
 
-## Estrutura que já foi preparada
+## Estrutura implementada
 
 O código segue a estrutura Maven em `src/main/java/br/com/planilhacerta/`. As entidades estão em `domain/model`, os enums em `domain/enums`, os serviços em `service` e a demonstração em `app`. Veja [ARQUITETURA.md](ARQUITETURA.md) para localizar cada responsabilidade.
 
@@ -29,56 +29,45 @@ O código segue a estrutura Maven em `src/main/java/br/com/planilhacerta/`. As e
 | `Contrato.java` | Cliente, projeto por identificador, especialização do serviço, datas, valor e modalidade de pagamento. |
 | `CategoriaCliente.java`, `Especializacao.java`, `ModalidadePagamento.java` | Valores permitidos pelo enunciado. |
 | `ClienteService.java` e `ConsultorService.java` | Cadastrar, listar e buscar por identificador; filtro de especialização para consultores. |
-| `ContratoService.java` | Lista e busca de contratos, com cadastro ainda pendente. |
-| `AlocacaoService.java` | Assinaturas e orientações para você escrever o algoritmo. |
-| `Main.java` | Demonstração executável das partes prontas. |
+| `ContratoService.java` | Cadastro, lista e busca de contratos, com atualização do histórico do cliente. |
+| `AlocacaoService.java` | Seleção por especialização e carga, pedido VIP antes de Regular e proteção contra alocação duplicada. |
+| `Main.java` | Demonstração de cadastros, histórico, disputa pela última vaga e liberação para o próximo contrato. |
 
-Campos como identificador, nome e e-mail são escolhas iniciais de modelagem; o PDF não especifica todos os dados do cadastro. `BigDecimal` foi usado para valores e `LocalDate` para datas. Não existe campo de pontos nesta etapa: a fidelidade será integrada com Cezar.
+Os cadastros usam identificador, nome e e-mail. O contrato usa `BigDecimal` para o valor informado e `LocalDate` para as datas.
 
-## Sua implementação, na ordem sugerida
+## Regras do módulo
 
-Os métodos abaixo têm `TODO Cássio` e lançam uma exceção indicando que estão incompletos. Substitua essa exceção pela implementação de cada regra.
-
-1. **`Consultor.temDisponibilidade()`**: verificar se a quantidade de projetos ativos está abaixo do limite de 3.
-2. **`Consultor.adicionarProjeto()`**: validar o identificador, rejeitar projeto repetido e impedir um quarto projeto. Fazer as verificações antes de alterar a lista.
-3. **`Consultor.removerProjeto()`**: liberar a vaga ao receber a conclusão de Arthur e tratar identificadores inválidos ou não encontrados.
-4. **`Cliente.registrarContrato()`**: confirmar que o contrato pertence ao cliente e impedir repetição no histórico.
-5. **`ContratoService.cadastrar()`**: validar o contrato, impedir identificadores repetidos e registrar tanto no serviço quanto no histórico do cliente. Uma falha não deve deixar apenas uma das listas alterada.
-6. **`AlocacaoService.selecionarConsultor()`**: filtrar a área exigida, excluir quem já tem 3 projetos e escolher a menor carga. Sem candidato, retornar `Optional.empty()`.
-7. **`AlocacaoService.ordenarPorPrioridade()`**: devolver os contratos pendentes em uma nova lista com VIP antes de Regular, chamando `temPrioridadeNaAlocacao()`.
-8. **`AlocacaoService.alocar()`**: usar a seleção e registrar o projeto no consultor escolhido, impedindo nova alocação de um projeto já ativo em qualquer consultor. Sem candidato, devolver `Optional.empty()` e deixar o pedido pendente para nova tentativa.
-
-**Prioridade VIP depende da fila de pedidos.** O chamador deve ordenar os contratos pendentes antes de chamar `alocar()` para cada um. Ordenar consultores não resolve a prioridade entre clientes. O PDF não exige retirar consultor de projeto Regular já iniciado.
-
-O professor não define o desempate entre consultores com a mesma carga ou entre clientes da mesma categoria. Combine e documente uma regra com a equipe. Manter a ordem de chegada é uma possibilidade. A definição de erros para entradas inválidas também fica para sua implementação.
-
-Depois dos métodos, acrescente à demonstração um fluxo de contrato e alocação. Na integração final, verifique com a equipe o cadastro completo e a necessidade de edição/remoção, sem permitir que essas operações invalidem vínculos existentes.
+- `ContratoService.cadastrar()` rejeita IDs já cadastrados e registra o contrato no histórico do titular. A entidade `Cliente` valida o vínculo e a unicidade antes de gravar o histórico.
+- `Consultor` guarda até três identificadores de projetos ativos. A remoção de um identificador ativo libera uma vaga. Identificadores vazios, repetidos ou ausentes na remoção são recusados.
+- `AlocacaoService.ordenarPorPrioridade()` devolve a fila com clientes VIP antes de clientes regulares. A ordem de chegada é mantida dentro de cada categoria, e o chamador usa a fila retornada para processar as alocações.
+- Dentro da especialização exigida, a seleção compara a quantidade de projetos ativos. Quando dois consultores têm a mesma carga, vence o menor identificador em ordem lexicográfica.
+- Use uma instância de alocação para o cadastro de consultores. Ao restaurar a base, forneça a lista completa na primeira chamada para localizar vínculos existentes. Uma tentativa posterior com uma lista filtrada reaproveita o vínculo ativo quando o projeto já foi alocado. Sem consultor elegível, `Optional.empty()` indica que o contrato deve seguir na fila.
 
 ## Como explicar POO na apresentação
 
 - **Abstração:** `Pessoa` e `Cliente` representam bases comuns; as classes concretas representam clientes, consultores e contratos do domínio.
-- **Encapsulamento:** atributos privados e cópias das listas impedem alterações externas. Seus métodos de negócio vão proteger o limite de projetos e o histórico.
+- **Encapsulamento:** atributos privados e cópias das listas impedem alterações externas. Os métodos de negócio protegem o limite de projetos e o histórico.
 - **Herança:** `Cliente` e `Consultor` herdam de `Pessoa`; `ClienteRegular` e `ClienteVIP` herdam de `Cliente`.
-- **Polimorfismo:** uma referência `Cliente` responde à categoria e à prioridade conforme seu tipo concreto. Use esse comportamento na ordenação, como mostrado no `Main`.
+- **Polimorfismo:** uma referência `Cliente` responde à categoria e à prioridade conforme seu tipo concreto. A ordenação usa `temPrioridadeNaAlocacao()` da classe concreta.
 
 `Contrato` se relaciona com `Cliente` por associação; não há motivo para forçar herança entre eles.
 
+### Trecho para o relatório da equipe
+
+```java
+public synchronized boolean temDisponibilidade() {
+    return projetosAtivos.size() < LIMITE_PROJETOS_ATIVOS;
+}
+```
+
+O limite fica na entidade `Consultor`. Tanto o serviço de alocação quanto o próprio cadastro de um projeto ativo verificam essa disponibilidade. [Consultor.java](../src/main/java/br/com/planilhacerta/domain/model/Consultor.java)
+
 ## Integração com a equipe
 
-- **Arthur — Projetos e Etapas:** nesta etapa, contratos e consultores guardam o identificador do projeto. Combine como obter esse identificador, a especialização exigida, atribuir o consultor retornado à classe `Projeto` e liberar a vaga quando o projeto deixar de estar ativo. Mantenham a mesma especialização no contrato e no projeto. A referência por identificador é uma escolha provisória para seu esqueleto compilar sem implementar a parte dele.
-- **Cezar — Faturamento e Fidelidade:** forneça categoria, histórico de contratos, especializações contratadas, valor e modalidade de pagamento. Os **10% de desconto VIP**, os pontos e o desconto progressivo pertencem ao módulo dele. O valor no contrato representa o valor informado, sem cálculo de desconto neste esqueleto.
+- **Arthur — Projetos e Etapas:** contratos e consultores guardam o identificador do projeto. A integração deve vincular o consultor retornado à classe `Projeto` e chamar `removerProjeto()` no consultor quando o projeto for concluído.
+- **Cezar — Faturamento e Fidelidade:** o módulo fornece categoria, histórico de contratos, especializações contratadas, valor e modalidade de pagamento. O contrato guarda o valor informado para o faturamento.
 - **Lukas — Persistência, Relatórios e Interface:** ele usará os serviços no menu e cuidará de salvar/carregar os dados em arquivos. As exceções de validação e a falta de consultor disponível devem virar mensagens compreensíveis na interface. Combinem também como restaurar históricos e projetos ativos ao carregar os dados.
 
-## Cenários para você conferir ao terminar
+## Validação
 
-- [ ] Cliente Regular e VIP cadastrados; identificadores repetidos recusados.
-- [ ] Contrato aparece no histórico do cliente correto, sem repetição.
-- [ ] Nome vazio, contrato sem cliente, valor inválido e prazo anterior ao início são recusados.
-- [ ] Consultor Financeiro nunca recebe projeto de TI ou Gestão.
-- [ ] Entre consultores da mesma área com 0, 1 e 2 projetos, vence o de 0.
-- [ ] Consultor com 3 projetos não recebe outro; após liberar um, volta a ter vaga.
-- [ ] Quando VIP e Regular disputam a última vaga da mesma área na fila, VIP é atendido primeiro.
-- [ ] Sem consultor da área ou sem vagas, o pedido continua pendente sem alocação indevida.
-- [ ] O mesmo projeto não fica duplicado no consultor nem alocado a dois consultores.
-
-O `Main` atual demonstra somente os cadastros prontos; esses cenários de negócio ficam para sua implementação e verificação. Para o relatório final, registre o que você implementou, dificuldades, referências e uma classe importante, como pede o edital.
+O Maven executa testes do histórico, das validações de contrato, das vagas, da especialização e da menor carga, da prioridade VIP e de pedidos de alocação repetidos e concorrentes. O `Main` demonstra o cadastro e uma fila real de dois contratos com uma vaga. [CoreConsultoriaTest.java](../src/test/java/br/com/planilhacerta/service/CoreConsultoriaTest.java)

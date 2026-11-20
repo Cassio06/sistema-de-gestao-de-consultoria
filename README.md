@@ -2,17 +2,18 @@
 
 Projeto acadêmico em Java da disciplina de **Programação Orientada a Objetos** do **iCEV — Instituto de Ensino Superior**. **Planilha Certa** é a empresa descrita no enunciado: oferece planejamento financeiro, gestão empresarial e análise de dados.
 
-Este esqueleto cobre a parte de **Cássio: entidades, cadastros e alocação de consultores**. O roteiro do que está pronto e do que você deve desenvolver está em [docs/ESCOPO_CASSIO.md](docs/ESCOPO_CASSIO.md).
+Esta branch contém o módulo de **entidades, cadastros e alocação de consultores**, sob responsabilidade de Cássio. [Escopo do módulo](docs/ESCOPO_CASSIO.md)
 
 ## O que já funciona
 
 - Classes de clientes Regular/VIP, consultores e contratos, com atributos privados, construtores e consultas.
 - Categorias de cliente, especializações e modalidades de pagamento definidas em enums.
 - Cadastro, listagem e busca de clientes e consultores em memória, com rejeição de identificadores repetidos.
+- Cadastro de contratos com registro no histórico do cliente e proteção contra duplicidades.
+- Seleção do consultor da especialização exigida com menor carga, com limite de três projetos ativos por consultor e liberação de vaga ao concluir um projeto.
+- Fila de alocação com prioridade VIP e ordem de chegada dentro da mesma categoria.
 - Validações básicas de campos obrigatórios, valor positivo e prazo final do contrato.
 - Demonstração de herança e polimorfismo entre os tipos de cliente.
-
-**Histórico de contratos, cadastro integrado de contratos, controle de projetos ativos e alocação ainda precisam ser implementados nos `TODOs`.** Esses métodos lançam `UnsupportedOperationException` enquanto estiverem incompletos. A demonstração chama apenas as partes prontas.
 
 ## Organização
 
@@ -27,7 +28,7 @@ A documentação e os PDFs ficam em `docs/`. Veja a árvore completa e as decis�
 
 ## Como compilar e executar
 
-Use **JDK 17 ou superior**. Esta é a versão mínima escolhida para o esqueleto; o professor não exige uma versão específica. O Maven Wrapper incluído usa Maven 3.9.9, sem precisar de uma instalação separada do Maven. A primeira compilação precisa de internet para baixar o Maven e os plugins de build.
+Use **JDK 17 ou superior**. O projeto inclui o Maven Wrapper com Maven 3.9.9. A primeira compilação precisa de internet para baixar o Maven, os plugins e as dependências de teste.
 
 Na raiz do projeto, em Linux/macOS:
 
@@ -45,11 +46,11 @@ java -jar target/planilha-certa.jar
 
 No IntelliJ IDEA, abra o `pom.xml` como projeto Maven e selecione um JDK 17 ou superior. A classe de entrada é `br.com.planilhacerta.app.Main`.
 
-A execução mostra dois clientes de exemplo, um consultor e a diferença de prioridade entre Regular e VIP. Os dados são apenas de demonstração e ficam em memória até o encerramento. O comando `verify` compila e gera o JAR; **ainda não há testes automatizados no projeto**. Os cenários para conferir as regras após sua implementação estão no roteiro de Cássio.
+O comando `verify` compila o módulo, executa os testes JUnit e gera o JAR. A demonstração cadastra dois contratos e mostra a última vaga em Financeiro sendo ocupada primeiro pelo VIP. Ao liberar essa vaga, o cliente Regular é atendido. Os dados do exemplo ficam em memória.
 
 ## Limites desta etapa
 
-Projetos/etapas são de Arthur; faturamento/fidelidade, de Cezar; persistência, relatórios e interface, de Lukas. A persistência em arquivos e o tratamento de erros no menu continuam obrigatórios para a entrega final, conforme o edital. Este esqueleto ainda não representa o sistema completo.
+Os serviços deste módulo usam o identificador de projeto. A integração final deve conectar os projetos e etapas de Arthur, o faturamento e a fidelidade de Cezar e o menu e a persistência de Lukas.
 
 ## Enunciados utilizados
 

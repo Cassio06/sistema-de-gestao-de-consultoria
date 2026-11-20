@@ -4,30 +4,52 @@ import br.com.planilhacerta.domain.enums.Especializacao;
 import br.com.planilhacerta.domain.model.Consultor;
 import br.com.planilhacerta.domain.model.Contrato;
 
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 public class AlocacaoService {
+    private static final Object BLOQUEIO_ALOCACAO = new Object();
+    private final Set<Consultor> consultoresConhecidos = new LinkedHashSet<>();
+
     public Optional<Consultor> selecionarConsultor(Especializacao exigida, List<Consultor> consultores) {
-        // TODO Cássio: considerar apenas a especialização exigida e quem tem vaga.
-        // Escolher o menor número de projetos ativos; retornar Optional.empty() sem candidato.
-        // O PDF não define desempate: combine uma regra com a equipe e documente.
-        throw new UnsupportedOperationException("Cássio: implementar a seleção por especialização e carga.");
+        Objects.requireNonNull(exigida, "Informe a especialização exigida.");
+        return List.copyOf(consultores).stream()
+                .filter(consultor -> consultor.getEspecializacao() == exigida && consultor.temDisponibilidade())
+                .min(Comparator.comparingInt(Consultor::getQuantidadeProjetosAtivos)
+                        .thenComparing(Consultor::getId));
     }
 
     public List<Contrato> ordenarPorPrioridade(List<Contrato> contratosPendentes) {
-        // TODO Cássio: devolver uma nova lista, atendendo VIP antes de Regular.
-        // Usar contrato.getCliente().temPrioridadeNaAlocacao() para aplicar polimorfismo.
-        // Preservar a ordem de chegada entre clientes de mesma prioridade é uma opção de desempate.
-        throw new UnsupportedOperationException("Cássio: implementar a ordem de atendimento.");
+        return List.copyOf(contratosPendentes).stream()
+                .sorted(Comparator.comparing((Contrato contrato) -> contrato.getCliente().temPrioridadeNaAlocacao())
+                        .reversed())
+                .toList();
     }
 
     public Optional<Consultor> alocar(Contrato contrato, List<Consultor> consultores) {
-        // TODO Cássio: selecionar o consultor e registrar o projeto como ativo nele.
-        // Sem candidato, retornar Optional.empty() para o chamador manter o contrato pendente.
-        // Impedir que o mesmo projeto seja alocado novamente, inclusive a outro consultor.
-        // A fila deve chamar este método na ordem retornada por ordenarPorPrioridade.
-        // O consultor retornado será vinculado ao Projeto na integração com Arthur.
-        throw new UnsupportedOperationException("Cássio: implementar a alocação do projeto.");
+        Objects.requireNonNull(contrato, "Informe o contrato.");
+        List<Consultor> candidatos = List.copyOf(consultores);
+        String projetoId = contrato.getProjetoId();
+        synchronized (BLOQUEIO_ALOCACAO) {
+            // Uma nova tentativa pode trazer só os consultores disponíveis.
+            consultoresConhecidos.addAll(candidatos);
+            Optional<Consultor> atual = consultoresConhecidos.stream()
+                    .filter(consultor -> consultor.getProjetosAtivos().contains(projetoId))
+                    .findFirst();
+            if (atual.isPresent()) {
+                if (atual.get().getEspecializacao() != contrato.getEspecializacao()) {
+                    throw new IllegalStateException("O projeto está ativo em outra especialização.");
+                }
+                return atual;
+            }
+
+            Optional<Consultor> selecionado = selecionarConsultor(contrato.getEspecializacao(), candidatos);
+            selecionado.ifPresent(consultor -> consultor.adicionarProjeto(projetoId));
+            return selecionado;
+        }
     }
 }

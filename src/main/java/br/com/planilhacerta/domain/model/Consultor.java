@@ -21,28 +21,33 @@ public class Consultor extends Pessoa {
         return especializacao;
     }
 
-    public List<String> getProjetosAtivos() {
+    public synchronized List<String> getProjetosAtivos() {
         return List.copyOf(projetosAtivos);
     }
 
-    public int getQuantidadeProjetosAtivos() {
+    public synchronized int getQuantidadeProjetosAtivos() {
         return projetosAtivos.size();
     }
 
-    public boolean temDisponibilidade() {
-        // TODO Cássio: comparar a quantidade de projetos com LIMITE_PROJETOS_ATIVOS.
-        throw new UnsupportedOperationException("Cássio: implementar a verificação de disponibilidade.");
+    public synchronized boolean temDisponibilidade() {
+        return projetosAtivos.size() < LIMITE_PROJETOS_ATIVOS;
     }
 
-    public void adicionarProjeto(String projetoId) {
-        // TODO Cássio: validar o identificador, impedir repetição e respeitar o limite.
-        // Só modificar a lista depois que todas as verificações passarem.
-        throw new UnsupportedOperationException("Cássio: implementar a inclusão de projeto ativo.");
+    public synchronized void adicionarProjeto(String projetoId) {
+        String id = textoObrigatorio(projetoId, "Identificador do projeto");
+        if (projetosAtivos.contains(id)) {
+            throw new IllegalArgumentException("O projeto já está ativo neste consultor.");
+        }
+        if (!temDisponibilidade()) {
+            throw new IllegalStateException("O consultor já atingiu o limite de projetos ativos.");
+        }
+        projetosAtivos.add(id);
     }
 
-    public void removerProjeto(String projetoId) {
-        // TODO Cássio: liberar a vaga quando Arthur informar a conclusão do projeto.
-        // Validar o identificador e definir o erro para projeto não encontrado.
-        throw new UnsupportedOperationException("Cássio: implementar a liberação de projeto ativo.");
+    public synchronized void removerProjeto(String projetoId) {
+        String id = textoObrigatorio(projetoId, "Identificador do projeto");
+        if (!projetosAtivos.remove(id)) {
+            throw new IllegalArgumentException("O projeto não está ativo neste consultor.");
+        }
     }
 }

@@ -11,36 +11,36 @@ O código segue a estrutura convencional de um projeto Java com Maven. Cada paco
 ├── README.md                            # Visão geral e execução
 ├── docs/
 │   ├── ARQUITETURA.md                    # Organização e dependências
-│   ├── ESCOPO_CASSIO.md                  # Requisitos, TODOs e integrações
+│   ├── ESCOPO_CASSIO.md                  # Requisitos, regras e integrações
 │   └── enunciados/                       # PDFs originais do professor
-└── src/main/java/br/com/planilhacerta/
-    ├── app/
-    │   └── Main.java                     # Entrada e demonstração
-    ├── domain/
-    │   ├── enums/                        # Categoria, especialização e pagamento
-    │   └── model/                        # Pessoa, clientes, consultor e contrato
-    └── service/                          # Cadastros e coordenação da alocação
+├── src/main/java/br/com/planilhacerta/
+│   ├── app/
+│   │   └── Main.java                     # Entrada e demonstração
+│   ├── domain/
+│   │   ├── enums/                        # Categoria, especialização e pagamento
+│   │   └── model/                        # Pessoa, clientes, consultor e contrato
+│   └── service/                          # Cadastros e coordenação da alocação
+└── src/test/java/br/com/planilhacerta/
+    └── service/CoreConsultoriaTest.java  # Testes do módulo
 ```
 
-`target/` é criado pelo Maven para classes e JARs; está ignorado pelo Git. As pastas são mantidas conforme passam a ter código: os testes futuros devem ir em `src/test/java`, espelhando os pacotes das classes verificadas.
+`target/` contém os arquivos gerados pelo Maven e está no `.gitignore`. Os testes ficam em `src/test/java`.
 
 ## Responsabilidade dos pacotes
 
 | Pacote | Responsabilidade |
 | --- | --- |
 | `domain.enums` | Define os valores aceitos no domínio: `CategoriaCliente`, `Especializacao` e `ModalidadePagamento`. |
-| `domain.model` | Representa o negócio e protege o estado de pessoas, clientes, consultores e contratos. As regras de histórico e limite de projetos ainda têm TODOs. |
-| `service` | Oferece cadastros e consultas e coordena a seleção e a alocação de consultores. As regras pendentes estão descritas no roteiro. |
+| `domain.model` | Representa pessoas, clientes, consultores e contratos. Protege o histórico do cliente e as três vagas de cada consultor. |
+| `service` | Cadastra e consulta entidades, registra contratos no histórico e coordena a seleção e a alocação de consultores. |
 | `app` | Monta os exemplos e inicia a execução. A interface final será integrada com Lukas. |
 
 A direção das dependências é `app → service → domain.model → domain.enums`; a aplicação também instancia os modelos diretamente. O domínio não depende do console, do Maven ou de armazenamento em arquivos.
 
 ## Decisões de organização
 
-- As regras locais ficam nas entidades: por exemplo, o próprio `Consultor` deve impedir um quarto projeto ativo.
-- Os serviços coordenam operações: `AlocacaoService` compara os consultores e organiza a prioridade dos contratos pendentes.
+- O próprio `Consultor` impede um quarto projeto ativo. `Cliente` protege a lista de contratos do titular.
+- `AlocacaoService` organiza a fila VIP, seleciona a menor carga da especialização e evita atribuir um projeto ativo a outro consultor.
 - Os cadastros usam listas em memória nesta etapa. A persistência em arquivos será integrada com Lukas.
 - Os projetos são referenciados por identificador até a integração com Arthur, sem duplicar a implementação da classe `Projeto`.
-- Não há bibliotecas de aplicação externas. O Maven padroniza compilação, versão do Java e empacotamento.
-
-Os métodos pendentes continuam sinalizados por `TODO Cássio` e `UnsupportedOperationException`. A reorganização não conclui essas regras: elas são a sua parte prática, detalhada em [ESCOPO_CASSIO.md](ESCOPO_CASSIO.md).
+- O módulo usa apenas a biblioteca padrão em tempo de execução. JUnit é usado nos testes, e o Maven compila e empacota o projeto.

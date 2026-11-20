@@ -1,26 +1,33 @@
 package br.com.planilhacerta.service;
 
+import br.com.planilhacerta.domain.model.Cliente;
 import br.com.planilhacerta.domain.model.Contrato;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class ContratoService {
     private final List<Contrato> contratos = new ArrayList<>();
 
-    public void cadastrar(Contrato contrato) {
-        // TODO Cássio: validar contrato e impedir identificadores repetidos.
-        // Registrar no histórico do cliente e na lista de contratos de forma consistente.
-        // Se uma validação falhar, nenhuma das duas listas deve ser alterada.
-        throw new UnsupportedOperationException("Cássio: implementar o cadastro de contrato e histórico.");
+    public synchronized void cadastrar(Contrato contrato) {
+        Objects.requireNonNull(contrato, "Informe o contrato.");
+        if (buscarPorId(contrato.getId()).isPresent()) {
+            throw new IllegalArgumentException("Já existe um contrato com esse identificador.");
+        }
+        Cliente cliente = contrato.getCliente();
+        synchronized (cliente) {
+            cliente.registrarContrato(contrato);
+            contratos.add(contrato);
+        }
     }
 
-    public List<Contrato> listar() {
+    public synchronized List<Contrato> listar() {
         return List.copyOf(contratos);
     }
 
-    public Optional<Contrato> buscarPorId(String id) {
+    public synchronized Optional<Contrato> buscarPorId(String id) {
         return contratos.stream().filter(contrato -> contrato.getId().equals(id)).findFirst();
     }
 }
