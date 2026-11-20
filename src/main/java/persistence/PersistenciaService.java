@@ -29,23 +29,30 @@ public class PersistenciaService {
         this.driveService = new GoogleDriveService();
     }
 
-    public void salvarDados(BancoDados banco) {
+    public boolean salvarDados(BancoDados banco) {
+        return gravarDados(banco, true);
+    }
+
+    private boolean gravarDados(BancoDados banco, boolean atualizarBackup) {
         try {
-            // Cria cópia de segurança (.bak.json) antes de sobrescrever o arquivo principal
             Path pathPrincipal = Paths.get(ARQUIVO_JSON);
-            if (Files.exists(pathPrincipal) && Files.size(pathPrincipal) > 0) {
+            // Só atualiza o .bak.json se o arquivo principal atual existir E for um JSON válido
+            if (atualizarBackup && Files.exists(pathPrincipal) && lerArquivoJson(ARQUIVO_JSON) != null) {
                 Files.copy(pathPrincipal, Paths.get(ARQUIVO_BACKUP), StandardCopyOption.REPLACE_EXISTING);
             }
 
             try (Writer writer = new OutputStreamWriter(new FileOutputStream(ARQUIVO_JSON), StandardCharsets.UTF_8)) {
                 gson.toJson(banco, writer);
-                System.out.println("[PERSISTÊNCIA] Dados salvos em '" + ARQUIVO_JSON + "' (backup .bak atualizado).");
+                System.out.println("[PERSISTÊNCIA] Dados salvos em '" + ARQUIVO_JSON + "'"
+                        + (atualizarBackup ? " (backup .bak atualizado)." : " (restaurado do backup)."));
             }
 
             // Desafio Extra: Tentativa de backup no Google Drive
             driveService.enviarBackup(new File(ARQUIVO_JSON));
+            return true;
         } catch (IOException e) {
             System.out.println("[ERRO DE ARQUIVO] Não foi possível salvar os dados: " + e.getMessage());
+            return false;
         }
     }
 
@@ -58,7 +65,7 @@ public class PersistenciaService {
                 System.out.println("[RECUPERAÇÃO] Arquivo principal ausente. Restaurando a partir de '" + ARQUIVO_BACKUP + "'...");
                 BancoDados recuperado = lerArquivoJson(ARQUIVO_BACKUP);
                 if (recuperado != null) {
-                    salvarDados(recuperado);
+                    gravarDados(recuperado, false);
                     return recuperado;
                 }
             }
@@ -79,7 +86,8 @@ public class PersistenciaService {
             BancoDados recuperado = lerArquivoJson(ARQUIVO_BACKUP);
             if (recuperado != null) {
                 System.out.println("[RECUPERAÇÃO] Dados restaurados com sucesso a partir do arquivo de backup!");
-                salvarDados(recuperado);
+                // Restaura apenas o arquivo principal sem sobrescrever o .bak válido
+                gravarDados(recuperado, false);
                 return recuperado;
             }
         }
@@ -90,8 +98,12 @@ public class PersistenciaService {
 
     private BancoDados lerArquivoJson(String caminho) {
         try (Reader reader = new InputStreamReader(new FileInputStream(caminho), StandardCharsets.UTF_8)) {
-            return gson.fromJson(reader, BancoDados.class);
-        } catch (JsonSyntaxException | IOException e) {
+            BancoDados dados = gson.fromJson(reader, BancoDados.class);
+            if (dados != null) {
+                dados.sanitizar();
+            }
+            return dados;
+        } catch (JsonParseException | IOException e) {
             return null;
         }
     }

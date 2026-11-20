@@ -73,7 +73,7 @@ public class RelatorioService {
             }
 
             String nomeArquivo = String.format("relatorios_pdf/Relatorio_%s_%s.pdf",
-                    projeto.getId(), cliente.getNome().replaceAll("\\s+", "_"));
+                    projeto.getId(), sanitizarNomeArquivo(cliente.getNome()).replaceAll("\\s+", "_"));
 
             PdfWriter writer = new PdfWriter(nomeArquivo);
             PdfDocument pdf = new PdfDocument(writer);
@@ -172,5 +172,14 @@ public class RelatorioService {
         } catch (Throwable t) {
             System.out.println("[INFO] Não foi possível abrir o PDF automaticamente. Acesse-o na pasta 'relatorios_pdf'.");
         }
+    }
+
+    private String sanitizarNomeArquivo(String texto) {
+        if (texto == null || texto.isBlank()) {
+            return "sem_nome";
+        }
+        String semAcentos = java.text.Normalizer.normalize(texto, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        return semAcentos.replaceAll("[^a-zA-Z0-9._-]", "_");
     }
 }

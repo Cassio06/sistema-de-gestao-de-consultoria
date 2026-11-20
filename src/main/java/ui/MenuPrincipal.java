@@ -85,10 +85,13 @@ public class MenuPrincipal {
         String id = "CLI-" + (banco.clientes.size() + 1);
         Cliente novo = new Cliente(id, nome, email, telefone, tipo == 2);
         banco.clientes.add(novo);
-        persistencia.salvarDados(banco);
 
-        System.out.printf("Cliente '%s' (%s) cadastrado com ID %s!%n",
-                novo.getNome(), novo.getCategoriaTexto(), novo.getId());
+        if (persistencia.salvarDados(banco)) {
+            System.out.printf("Cliente '%s' (%s) cadastrado com ID %s!%n",
+                    novo.getNome(), novo.getCategoriaTexto(), novo.getId());
+        } else {
+            System.out.println("[AVISO] Cliente mantido em memória, mas houve falha ao gravar no arquivo.");
+        }
     }
 
     private void cadastrarConsultor() {
@@ -101,10 +104,13 @@ public class MenuPrincipal {
         String id = "CON-" + (banco.consultores.size() + 1);
         Consultor novo = new Consultor(id, nome, email, telefone, esp);
         banco.consultores.add(novo);
-        persistencia.salvarDados(banco);
 
-        System.out.printf("Consultor '%s' (%s) cadastrado com ID %s!%n",
-                novo.getNome(), esp.getDescricao(), novo.getId());
+        if (persistencia.salvarDados(banco)) {
+            System.out.printf("Consultor '%s' (%s) cadastrado com ID %s!%n",
+                    novo.getNome(), esp.getDescricao(), novo.getId());
+        } else {
+            System.out.println("[AVISO] Consultor mantido em memória, mas houve falha ao gravar no arquivo.");
+        }
     }
 
     private void listarPessoas() {
@@ -136,7 +142,7 @@ public class MenuPrincipal {
             return;
         }
 
-        System.out.println("\n--- NOVO PROJETO DE CONSULTORIA ---");
+        System.out.println("\n--- NOVO PROJETO / CONTRATO DE CONSULTORIA ---");
         for (int i = 0; i < banco.clientes.size(); i++) {
             Cliente c = banco.clientes.get(i);
             System.out.printf("%d. %s (%s)%n", i + 1, c.getNome(), c.getCategoriaTexto());
@@ -169,7 +175,7 @@ public class MenuPrincipal {
         for (String nomeEtapa : nomesEtapas) {
             System.out.println(">> Etapa: " + nomeEtapa);
             LocalDate prazo = ConsoleHelper.lerData("   Prazo de entrega");
-            double valor = ConsoleHelper.lerDoublePositivo("   Valor da etapa (R$): ");
+            double valor = ConsoleHelper.lerDecimalPositivo("   Valor da etapa (R$): ");
             if (cliente.isVip()) {
                 valor *= 0.90; // 10% desconto VIP
                 System.out.printf("   [Desconto VIP 10%% aplicado] Valor final da etapa: R$ %.2f%n", valor);
@@ -178,9 +184,15 @@ public class MenuPrincipal {
         }
 
         banco.projetos.add(projeto);
-        persistencia.salvarDados(banco);
-        System.out.printf("Projeto '%s' criado! Consultor alocado automaticamente: %s.%n",
-                projeto.getTitulo(), consultor.getNome());
+
+        if (persistencia.salvarDados(banco)) {
+            System.out.printf("Projeto '%s' criado! Consultor alocado automaticamente: %s.%n",
+                    projeto.getTitulo(), consultor.getNome());
+            System.out.printf("[CONTRATO & FATURAMENTO] Contrato CTR-%s gerado | Cliente: %s | Valor Total: R$ %.2f%n",
+                    projeto.getId(), cliente.getNome(), projeto.calcularValorTotal());
+        } else {
+            System.out.println("[AVISO] Projeto criado em memória, mas houve falha ao gravar no arquivo.");
+        }
     }
 
     private void atualizarEtapa() {
@@ -199,6 +211,12 @@ public class MenuPrincipal {
         Etapa etapa = projeto.getEtapas().get(idxEtapa);
 
         int novoStatus = ConsoleHelper.lerInteiro("Novo status (1 - Em Andamento | 2 - Concluída): ", 1, 2);
+
+        if (etapa.getStatusAtualizado() == StatusEtapa.CONCLUIDA) {
+            System.out.println("[AVISO] Esta etapa já está CONCLUÍDA. Nenhuma alteração ou pontuação extra foi aplicada.");
+            return;
+        }
+
         if (novoStatus == 1) {
             etapa.setStatus(StatusEtapa.EM_ANDAMENTO);
         } else {
@@ -212,8 +230,11 @@ public class MenuPrincipal {
             }
         }
 
-        persistencia.salvarDados(banco);
-        System.out.println("Status da etapa atualizado com sucesso!");
+        if (persistencia.salvarDados(banco)) {
+            System.out.println("Status da etapa atualizado com sucesso!");
+        } else {
+            System.out.println("[AVISO] Status atualizado em memória, mas houve falha ao gravar no arquivo.");
+        }
     }
 
     private void emitirRelatorio() {
@@ -252,9 +273,12 @@ public class MenuPrincipal {
         banco.clientes.add(cVip);
         banco.consultores.add(con1);
         banco.projetos.add(proj);
-        persistencia.salvarDados(banco);
 
-        System.out.println("[MODELO] Cenário pré-pronto carregado com sucesso (1 Cliente VIP, 1 Consultor e 1 Projeto com etapas)!");
+        if (persistencia.salvarDados(banco)) {
+            System.out.println("[MODELO] Cenário pré-pronto carregado com sucesso (1 Cliente VIP, 1 Consultor e 1 Projeto com etapas)!");
+        } else {
+            System.out.println("[AVISO] Cenário carregado em memória, mas houve falha ao gravar no arquivo.");
+        }
     }
 
     private Especializacao escolherEspecializacao() {

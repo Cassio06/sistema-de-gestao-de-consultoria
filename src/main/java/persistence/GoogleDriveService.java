@@ -10,17 +10,39 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 
 public class GoogleDriveService {
-    private static final String CREDENTIALS_PATH = "credentials.json";
+    private static final String CREDENTIALS_PATH = resolverCaminhoCredenciais();
+
+    private static String resolverCaminhoCredenciais() {
+        String envPath = System.getenv("GOOGLE_CREDENTIALS_PATH");
+        if (envPath != null && !envPath.isBlank()) {
+            return envPath.trim();
+        }
+        Path dotEnv = Paths.get(".env");
+        if (Files.exists(dotEnv)) {
+            try {
+                for (String linha : Files.readAllLines(dotEnv, StandardCharsets.UTF_8)) {
+                    if (linha.startsWith("GOOGLE_CREDENTIALS_PATH=")) {
+                        String valor = linha.split("=", 2)[1].trim().replace("\"", "");
+                        if (!valor.isEmpty()) return valor;
+                    }
+                }
+            } catch (IOException ignored) {
+            }
+        }
+        return "credentials.json";
+    }
 
     public void enviarBackup(java.io.File arquivoLocal) {
-        // Verifica se a credencial existe antes de tentar conectar (evita crash na apresentação sem internet/chave)
         if (!Files.exists(Paths.get(CREDENTIALS_PATH))) {
-            System.out.println("[GOOGLE DRIVE] Backup em nuvem ignorado (arquivo 'credentials.json' não configurado).");
+            System.out.println("[GOOGLE DRIVE] Backup em nuvem ignorado (credenciais '" + CREDENTIALS_PATH + "' não configuradas).");
             return;
         }
 

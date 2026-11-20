@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ModelosSistema {
@@ -53,13 +54,23 @@ public class ModelosSistema {
             this.pontosFidelidade = 0;
         }
 
+        public void garantirListas() {
+            if (especializacoesContratadas == null) {
+                especializacoesContratadas = new ArrayList<>();
+            }
+        }
+
         public boolean isVip() { return vip; }
         public void setVip(boolean vip) { this.vip = vip; }
         public int getPontosFidelidade() { return pontosFidelidade; }
         public void adicionarPontos(int pontos) { this.pontosFidelidade += pontos; }
-        public List<String> getEspecializacoesContratadas() { return especializacoesContratadas; }
+        public List<String> getEspecializacoesContratadas() {
+            garantirListas();
+            return especializacoesContratadas;
+        }
 
         public void registrarEspecializacao(Especializacao esp) {
+            garantirListas();
             if (!especializacoesContratadas.contains(esp.name())) {
                 especializacoesContratadas.add(esp.name());
             }
@@ -67,6 +78,7 @@ public class ModelosSistema {
 
         // Regra de negócio: recomenda áreas ainda não contratadas (usada no Relatório VIP)
         public List<Especializacao> gerarRecomendacoes() {
+            garantirListas();
             return Arrays.stream(Especializacao.values())
                     .filter(e -> !especializacoesContratadas.contains(e.name()))
                     .collect(Collectors.toList());
@@ -109,7 +121,10 @@ public class ModelosSistema {
         }
 
         public StatusEtapa getStatusAtualizado() {
-            if (status != StatusEtapa.CONCLUIDA && LocalDate.now().isAfter(prazo)) {
+            if (status == null) {
+                status = StatusEtapa.PENDENTE;
+            }
+            if (status != StatusEtapa.CONCLUIDA && prazo != null && LocalDate.now().isAfter(prazo)) {
                 this.status = StatusEtapa.ATRASADA;
             }
             return status;
@@ -137,7 +152,16 @@ public class ModelosSistema {
             this.area = area;
         }
 
+        public void garantirListas() {
+            if (etapas == null) {
+                etapas = new ArrayList<>();
+            } else {
+                etapas.removeIf(Objects::isNull);
+            }
+        }
+
         public double calcularProgresso() {
+            garantirListas();
             if (etapas.isEmpty()) return 0.0;
             long concluidas = etapas.stream()
                     .filter(e -> e.getStatusAtualizado() == StatusEtapa.CONCLUIDA)
@@ -146,10 +170,12 @@ public class ModelosSistema {
         }
 
         public double calcularValorTotal() {
+            garantirListas();
             return etapas.stream().mapToDouble(Etapa::getValor).sum();
         }
 
         public long contarEtapasAtrasadas() {
+            garantirListas();
             return etapas.stream()
                     .filter(e -> e.getStatusAtualizado() == StatusEtapa.ATRASADA)
                     .count();
@@ -160,7 +186,10 @@ public class ModelosSistema {
         public String getClienteId() { return clienteId; }
         public String getConsultorId() { return consultorId; }
         public Especializacao getArea() { return area; }
-        public List<Etapa> getEtapas() { return etapas; }
+        public List<Etapa> getEtapas() {
+            garantirListas();
+            return etapas;
+        }
     }
 
     // --- CONTAINER PARA PERSISTÊNCIA JSON ---
@@ -168,5 +197,18 @@ public class ModelosSistema {
         public List<Cliente> clientes = new ArrayList<>();
         public List<Consultor> consultores = new ArrayList<>();
         public List<Projeto> projetos = new ArrayList<>();
+
+        public void sanitizar() {
+            if (clientes == null) clientes = new ArrayList<>();
+            if (consultores == null) consultores = new ArrayList<>();
+            if (projetos == null) projetos = new ArrayList<>();
+
+            clientes.removeIf(Objects::isNull);
+            consultores.removeIf(Objects::isNull);
+            projetos.removeIf(Objects::isNull);
+
+            clientes.forEach(Cliente::garantirListas);
+            projetos.forEach(Projeto::garantirListas);
+        }
     }
 }
