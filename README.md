@@ -96,6 +96,7 @@ sistema-de-gestao-de-consultoria/
 │       └── README.md
 ├── .env.example                             # Exemplo de variáveis de ambiente (ex.: integração Google Drive)
 ├── .gitignore                               # Arquivos ignorados pelo Git
+├── ESCOPO_ARTHUR.md
 ├── README.md                                # Documentação principal do projeto
 ├── S10a - Gestão de Consultoria.docx.pdf    # Enunciado específico da equipe
 └── Trabalho P2.pdf                          # Diretrizes gerais e critérios de avaliação da P2
@@ -133,7 +134,7 @@ sistema-de-gestao-de-consultoria/
    javac -d out $(find src/main/java -name "*.java")
 
    # Executar a aplicação principal
-   java -cp out br.com.planilhacerta.Main
+   java -cp out Main
    ```
    *(Caso o grupo adote Maven ou Gradle na etapa de codificação, os comandos `mvn compile exec:java` ou `./gradlew run` serão atualizados nesta seção).*
 
