@@ -18,14 +18,15 @@ public class Main {
         LocalDate hoje = LocalDate.now();
 
         Projeto projeto = new Projeto(
-                1,
-                101,
-                201,
+                "PRJ-001",
+                "CLI-001",
+                null,
                 "Consultoria Financeira",
                 "Organizacao financeira empresarial",
                 hoje.minusDays(10),
                 hoje.plusDays(20)
         );
+        projeto.alocarConsultor("CON-001");
 
         Etapa analise = new Etapa(
                 "Analise inicial",

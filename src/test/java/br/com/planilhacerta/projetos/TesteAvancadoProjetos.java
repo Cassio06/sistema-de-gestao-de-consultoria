@@ -11,7 +11,7 @@ public class TesteAvancadoProjetos {
 
     public static void main(String[] args) {
 
-        LocalDate hoje = LocalDate.of(2026, 11, 19);
+        LocalDate hoje = LocalDate.now();
 
         MonitoramentoProjetos monitor =
                 new MonitoramentoProjetos();
@@ -138,21 +138,21 @@ public class TesteAvancadoProjetos {
                 100, 101, 201,
                 "Projeto A",
                 "Teste de compartilhamento",
-                LocalDate.of(2026, 11, 1),
-                LocalDate.of(2026, 11, 30)
+                hoje.minusDays(18),
+                hoje.plusDays(11)
         );
 
         Projeto projetoB = new Projeto(
                 200, 102, 202,
                 "Projeto B",
                 "Teste de compartilhamento",
-                LocalDate.of(2026, 11, 1),
-                LocalDate.of(2026, 11, 30)
+                hoje.minusDays(18),
+                hoje.plusDays(11)
         );
 
         Etapa etapaCompartilhada = new Etapa(
                 "Analise inicial",
-                LocalDate.of(2026, 11, 10),
+                hoje.minusDays(9),
                 new BigDecimal("500.00")
         );
 
@@ -171,6 +171,48 @@ public class TesteAvancadoProjetos {
                 compartilhamentoBloqueado
         );
 
+        Etapa conclusaoFutura = new Etapa("Entrega", hoje.plusDays(5), BigDecimal.TEN);
+        try {
+            conclusaoFutura.concluir(LocalDate.now().plusDays(1));
+            verificar("Data futura de conclusão é rejeitada", false);
+        } catch (IllegalArgumentException e) {
+            verificar("Data futura de conclusão é rejeitada sem alterar a etapa",
+                    conclusaoFutura.getStatus() == StatusEtapa.PENDENTE
+                            && conclusaoFutura.getDataConclusao() == null);
+        }
+
+        Projeto aguardando = new Projeto("PRJ-001", "CLI-001", null, "Consultoria",
+                "", hoje, hoje.plusDays(10));
+        verificar("Projeto aceita IDs de texto e pode aguardar consultor",
+                "PRJ-001".equals(aguardando.getId())
+                        && "CLI-001".equals(aguardando.getIdCliente())
+                        && aguardando.getIdConsultor() == null);
+
+        Etapa levantamento = new Etapa("Levantamento", hoje.plusDays(2), BigDecimal.TEN);
+        aguardando.adicionarEtapa(levantamento);
+        verificar("Etapa mantém o identificador de texto do projeto",
+                "PRJ-001".equals(levantamento.getIdProjeto()));
+
+        aguardando.alocarConsultor("CON-001");
+        aguardando.alocarConsultor("CON-001");
+        verificar("Projeto aceita alocação posterior e repetição do mesmo consultor",
+                "CON-001".equals(aguardando.getIdConsultor()));
+        try {
+            aguardando.alocarConsultor("CON-002");
+            verificar("Projeto impede trocar um consultor já alocado", false);
+        } catch (IllegalStateException e) {
+            verificar("Projeto impede trocar um consultor já alocado",
+                    "CON-001".equals(aguardando.getIdConsultor()));
+        }
+
+        String idDoContrato = "\u2003PRJ-002\u2003";
+        Projeto projetoDoContrato = new Projeto(" " + idDoContrato + " ", "CLI-001", null,
+                "Revisão", "", hoje, hoje.plusDays(10));
+        Etapa revisao = new Etapa("Revisão", hoje.plusDays(2), BigDecimal.TEN);
+        projetoDoContrato.adicionarEtapa(revisao);
+        verificar("Projeto e etapa preservam a normalização de IDs do cadastro de contratos",
+                idDoContrato.equals(projetoDoContrato.getId()) && idDoContrato.equals(revisao.getIdProjeto()));
+
         System.out.println(
                 "\n===== FIM DOS TESTES =====");
     }
@@ -181,7 +223,7 @@ public class TesteAvancadoProjetos {
         if (resultado) {
             System.out.println("[OK] " + descricao);
         } else {
-            System.out.println("[FALHOU] " + descricao);
+            throw new AssertionError(descricao);
         }
     }
 }

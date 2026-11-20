@@ -31,6 +31,8 @@ public class MonitoramentoProjetos {
 
         System.out.println("Projeto: " + projeto.getNome());
         System.out.println("ID: " + projeto.getId());
+        String consultor = projeto.getIdConsultor();
+        System.out.println(consultor == null ? "Aguardando alocação de consultor." : "Consultor: " + consultor);
 
         if (projeto.getEtapas().isEmpty()) {
             System.out.println("Nenhuma etapa cadastrada.");

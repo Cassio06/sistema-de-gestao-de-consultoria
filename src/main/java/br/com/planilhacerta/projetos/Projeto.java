@@ -10,9 +10,9 @@ import java.util.Objects;
 
 public class Projeto {
 
-    private final int id;
-    private final int idCliente;
-    private final int idConsultor;
+    private final String id;
+    private final String idCliente;
+    private String idConsultor;
     private final String nome;
     private final String descricao;
     private final LocalDate dataInicio;
@@ -26,13 +26,15 @@ public class Projeto {
                    String descricao,
                    LocalDate dataInicio,
                    LocalDate prazoFinal) {
+        this(identificadorNumerico(id), identificadorNumerico(idCliente), identificadorNumerico(idConsultor),
+                nome, descricao, dataInicio, prazoFinal);
+    }
 
-        if (id <= 0 || idCliente <= 0
-                || idConsultor <= 0) {
-            throw new IllegalArgumentException(
-                    "Os identificadores devem ser positivos."
-            );
-        }
+    public Projeto(String id, String idCliente,
+                   String idConsultor, String nome,
+                   String descricao,
+                   LocalDate dataInicio,
+                   LocalDate prazoFinal) {
 
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException(
@@ -52,15 +54,38 @@ public class Projeto {
             );
         }
 
-        this.id = id;
-        this.idCliente = idCliente;
-        this.idConsultor = idConsultor;
+        this.id = identificadorObrigatorio(id, "Identificador do projeto");
+        this.idCliente = identificadorObrigatorio(idCliente, "Identificador do cliente");
+        this.idConsultor = idConsultor == null ? null
+                : identificadorObrigatorio(idConsultor, "Identificador do consultor");
         this.nome = nome;
         this.descricao = descricao == null ? "" : descricao;
         this.dataInicio = dataInicio;
         this.prazoFinal = prazoFinal;
 
         this.etapas = new ArrayList<>();
+    }
+
+    public synchronized void alocarConsultor(String idConsultor) {
+        String novoId = identificadorObrigatorio(idConsultor, "Identificador do consultor");
+        if (this.idConsultor != null && !this.idConsultor.equals(novoId)) {
+            throw new IllegalStateException("O projeto já possui um consultor alocado.");
+        }
+        this.idConsultor = novoId;
+    }
+
+    private static String identificadorNumerico(int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("Os identificadores numéricos devem ser positivos.");
+        }
+        return Integer.toString(id);
+    }
+
+    private static String identificadorObrigatorio(String id, String campo) {
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException(campo + " deve ser informado.");
+        }
+        return id.trim();
     }
 
     // Adicionar uma etapa ao projeto
@@ -154,15 +179,15 @@ public class Projeto {
     }
 
     // Métodos de consulta
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public int getIdCliente() {
+    public String getIdCliente() {
         return idCliente;
     }
 
-    public int getIdConsultor() {
+    public synchronized String getIdConsultor() {
         return idConsultor;
     }
 
