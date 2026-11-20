@@ -64,4 +64,4 @@ Os cenários de regressão cobrem recuperação de arquivos inconsistentes, migr
 
 ## Integração com a equipe
 
-Na reunião das branches, o menu, a persistência e os relatórios devem ser ligados às entidades e à alocação do Cássio, aos projetos e etapas do Arthur e aos serviços de faturamento, fidelidade e recomendações do Cezar. O roteiro acima cobre a demonstração do módulo de Lukas na branch atual.
+O roteiro acima documenta a demonstração da branch isolada. Na main, o menu, a persistência e os relatórios já usam os serviços integrados. [Execução da versão integrada](README.md)

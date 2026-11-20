@@ -36,3 +36,12 @@ tokens/
 .settings/
 .DS_Store
 Thumbs.db
+
+# Dados e relatórios gerados pelo menu integrado
+data/consultoria*.json
+data/consultoria.lock
+data/dados-corrompidos-*.json
+data/dados.lock
+dados_planilha_certa*.json
+relatorio_planilha_certa.csv
+relatorios_pdf/

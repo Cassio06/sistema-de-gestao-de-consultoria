@@ -44,6 +44,11 @@ public class RelatorioService {
     }
 
     public void exibirRelatorioConsole(Projeto projeto, Cliente cliente, Consultor consultor) {
+        exibirRelatorioConsole(projeto, cliente, consultor, cliente.gerarRecomendacoes());
+    }
+
+    public void exibirRelatorioConsole(Projeto projeto, Cliente cliente, Consultor consultor,
+                                       List<Especializacao> recomendacoes) {
         System.out.println("\n=======================================================");
         System.out.println("      PLANILHA CERTA - RELATÓRIO DE DESEMPENHO");
         System.out.println("=======================================================");
@@ -72,7 +77,7 @@ public class RelatorioService {
         if (cliente.isVip()) {
             System.out.println("-------------------------------------------------------");
             System.out.println("★ SEÇÃO EXCLUSIVA VIP - RECOMENDAÇÕES DE SERVIÇOS:");
-            List<Especializacao> recomendacoes = cliente.gerarRecomendacoes();
+
             if (recomendacoes.isEmpty()) {
                 System.out.println("   Você já contratou todas as nossas especialidades! Aproveite 10% de desconto VIP contínuo.");
             } else {
@@ -85,6 +90,11 @@ public class RelatorioService {
     }
 
     public void gerarRelatorioPDF(Projeto projeto, Cliente cliente, Consultor consultor) {
+        gerarRelatorioPDF(projeto, cliente, consultor, cliente.gerarRecomendacoes());
+    }
+
+    public void gerarRelatorioPDF(Projeto projeto, Cliente cliente, Consultor consultor,
+                                  List<Especializacao> recomendacoes) {
         try {
             String nome = String.format("Relatorio_%s_%s.pdf",
                     sanitizarNomeArquivo(projeto.getId()), sanitizarNomeArquivo(cliente.getNome()));
@@ -92,7 +102,7 @@ public class RelatorioService {
             Files.createDirectories(diretorio);
             Path temporario = Files.createTempFile(diretorio, "relatorio-", ".tmp");
             try {
-                escreverPDF(temporario, projeto, cliente, consultor);
+                escreverPDF(temporario, projeto, cliente, consultor, recomendacoes);
                 try {
                     Files.move(temporario, destino, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
                 } catch (AtomicMoveNotSupportedException e) {
@@ -108,7 +118,8 @@ public class RelatorioService {
         }
     }
 
-    private void escreverPDF(Path arquivo, Projeto projeto, Cliente cliente, Consultor consultor) throws IOException {
+    private void escreverPDF(Path arquivo, Projeto projeto, Cliente cliente, Consultor consultor,
+                             List<Especializacao> recomendacoes) throws IOException {
         try (Document document = new Document(new PdfDocument(new PdfWriter(arquivo.toString())))) {
             // Cabeçalho
             Paragraph titulo = new Paragraph("PLANILHA CERTA - CONSULTORIA EMPRESARIAL")
@@ -135,7 +146,7 @@ public class RelatorioService {
             // Tabela de Etapas com destaque colorido por status
             document.add(new Paragraph("Detalhamento das Etapas").setBold().setFontSize(12).setMarginBottom(5));
             Table tabela = new Table(UnitValue.createPercentArray(new float[]{3.6f, 1.9f, 1.8f, 2.6f, 1.7f}))
-                    .useAllAvailableWidth();
+                    .useAllAvailableWidth().setFixedLayout();
 
             String[] cabecalhos = {"Etapa", "Prazo", "Valor (R$)", "Status", "Progresso"};
             for (String h : cabecalhos) {
@@ -170,7 +181,7 @@ public class RelatorioService {
                         .setFontSize(12)
                         .setFontColor(COR_AZUL_VIP));
 
-                List<Especializacao> recomendacoes = cliente.gerarRecomendacoes();
+
                 if (recomendacoes.isEmpty()) {
                     document.add(new Paragraph("Parabéns! Sua empresa já utiliza todo o ecossistema da Planilha Certa."));
                 } else {

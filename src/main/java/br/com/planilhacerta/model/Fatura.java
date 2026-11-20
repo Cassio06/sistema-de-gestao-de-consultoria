@@ -15,7 +15,7 @@ public final class Fatura {
     private final BigDecimal descontoFidelidade;
     private final BigDecimal valorLiquido;
     private final LocalDate dataEmissao;
-    private LocalDate dataPagamento;
+    private volatile LocalDate dataPagamento;
 
     public Fatura(String id, String contratoId, String clienteId, List<FaturaItem> itens,
                   BigDecimal descontoVip, BigDecimal descontoFidelidade, LocalDate dataEmissao) {
@@ -81,15 +81,32 @@ public final class Fatura {
         return dataPagamento != null;
     }
 
-    public void marcarPaga(LocalDate dataPagamento) {
-        if (isPaga()) {
-            throw new IllegalStateException("A fatura já foi paga");
+    public static Emissao emitir(String id, String contratoId, String clienteId, List<FaturaItem> itens,
+                                 BigDecimal descontoVip, BigDecimal descontoFidelidade, LocalDate dataEmissao) {
+        return new Emissao(new Fatura(id, contratoId, clienteId, itens, descontoVip, descontoFidelidade, dataEmissao));
+    }
+
+    public static final class Emissao {
+        private final Fatura fatura;
+
+        private Emissao(Fatura fatura) {
+            this.fatura = fatura;
         }
-        this.dataPagamento = Objects.requireNonNull(dataPagamento, "dataPagamento não pode ser nula");
+
+        public Fatura fatura() {
+            return fatura;
+        }
+
+        public void marcarPaga(LocalDate dataPagamento) {
+            if (fatura.isPaga()) {
+                throw new IllegalStateException("A fatura já foi paga");
+            }
+            fatura.dataPagamento = Objects.requireNonNull(dataPagamento, "dataPagamento não pode ser nula");
+        }
     }
 
     private static BigDecimal validarDesconto(BigDecimal valor, String campo) {
-        Objects.requireNonNull(valor, campo + " não pode ser nulo");
+        valor = FaturaItem.exigirCentavos(valor, campo);
         if (valor.signum() < 0) {
             throw new IllegalArgumentException(campo + " não pode ser negativo");
         }

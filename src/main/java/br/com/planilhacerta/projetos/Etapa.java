@@ -7,17 +7,26 @@ import java.util.Objects;
 
 public class Etapa {
 
+    private final String id;
     private String nome;
     private LocalDate prazo;
     private BigDecimal valor;
     private StatusEtapa status;
     private LocalDate dataConclusao;
-    private Integer idProjeto;
+    private String idProjeto;
 
 
     // Construtor
     public Etapa(String nome, LocalDate prazo,
                  BigDecimal valor) {
+        this(nome, nome, prazo, valor);
+    }
+
+    public Etapa(String id, String nome, LocalDate prazo, BigDecimal valor) {
+        if (id == null || id.isBlank()) {
+            throw new IllegalArgumentException("Informe o identificador da etapa.");
+        }
+        this.id = id.trim();
 
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException(
@@ -71,6 +80,10 @@ public class Etapa {
             );
         }
 
+        if (data.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("A data de conclusão não pode estar no futuro.");
+        }
+
         status = StatusEtapa.CONCLUIDA;
         dataConclusao = data;
     }
@@ -105,6 +118,10 @@ public class Etapa {
     }
 
     // Métodos de consulta
+    public String getId() { return id; }
+
+    public StatusEtapa getStatusRegistrado() { return status; }
+
     public String getNome() {
         return nome;
     }
@@ -135,6 +152,13 @@ public class Etapa {
                     "O ID do projeto deve ser positivo."
             );
         }
+        vincularProjeto(Integer.toString(idProjeto));
+    }
+
+    public void vincularProjeto(String idProjeto) {
+        if (idProjeto == null || idProjeto.isBlank()) {
+            throw new IllegalArgumentException("Informe o identificador do projeto.");
+        }
 
         if (this.idProjeto != null) {
             throw new IllegalStateException(
@@ -142,10 +166,10 @@ public class Etapa {
             );
         }
 
-        this.idProjeto = idProjeto;
+        this.idProjeto = idProjeto.trim();
     }
 
-    public Integer getIdProjeto() {
+    public String getIdProjeto() {
         return idProjeto;
     }
 

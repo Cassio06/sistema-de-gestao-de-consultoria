@@ -21,6 +21,18 @@ public class Cliente extends Pessoa implements ClienteIntegracao {
         this.vip = vip;
     }
 
+    public Cliente(String id, String nome, String email, String empresa, boolean vip,
+                   int pontos, BigDecimal saldo) {
+        this(id, nome, email, empresa, vip);
+        Objects.requireNonNull(saldo, "Saldo de fidelidade ausente");
+        if (pontos < 0 || saldo.signum() < 0 || saldo.compareTo(BigDecimal.valueOf(100)) >= 0
+                || saldo.stripTrailingZeros().scale() > 2) {
+            throw new IllegalArgumentException("Saldo de fidelidade inválido.");
+        }
+        this.pontosFidelidade = pontos;
+        this.valorPagoRestanteParaPonto = saldo;
+    }
+
     public String getEmpresa() { return empresa; }
     public void setEmpresa(String empresa) { this.empresa = empresa; }
 

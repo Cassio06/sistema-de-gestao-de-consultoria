@@ -2,7 +2,7 @@
 
 > **Instruções de Entrega (conforme `Trabalho P2.pdf`):**
 > - O relatório final deve ser entregue em formato **PDF** no dia anterior à apresentação (apresentações nos dias **23 e 26 de novembro**, conforme cronograma).
-> - Extensão mínima exigida: **4 páginas**.
+> - Extensão mínima do PDF coletivo: **4 páginas no total**.
 > - Este arquivo serve como esqueleto/template para a redação do documento final da equipe.
 > - A seção 6 do edital (6.1 a 6.5) descreve a **apresentação oral**; seus tópicos foram incluídos aqui como roteiro, junto com os itens obrigatórios do relatório (seção 8).
 
@@ -13,7 +13,7 @@
 - **Instituição:** iCEV — Instituto de Ensino Superior
 - **Disciplina:** Programação Orientada a Objetos (Trabalho da P2)
 - **Projeto:** Sistema de Gestão de Consultoria
-- **Tema atribuído:** [S10a — Gestão de Consultoria](../S10a%20-%20Gest%C3%A3o%20de%20Consultoria.docx.pdf)
+- **Tema atribuído:** [S10a — Gestão de Consultoria](enunciados/S10a%20-%20Gest%C3%A3o%20de%20Consultoria.docx.pdf)
 - **Integrantes:**
   - Cezar Gabriel de Souza Vicente Mendes
   - Artur Henrique Da Silva Alencar
@@ -56,6 +56,7 @@ Implementei os serviços de faturamento, fidelidade e recomendação, os modelos
   - **Encapsulamento:** Como as regras de limite de projetos por consultor, prazos de etapas e saldo de pontos foram protegidas.
   - **Herança:** Justificativa para a hierarquia de classes adotada (ex.: `ClienteRegular` e `ClienteVIP`).
   - **Polimorfismo:** Como descontos, prioridades e relatórios personalizados foram tratados polimorficamente.
+- **Contribuição de Lukas**. [Texto individual em PDF](RELATORIO_LUKAS.pdf).
 - **Classe de Destaque (Obrigatório no Relatório):**
   - *Inserir aqui o trecho de código ou captura de tela (screenshot) de uma classe considerada importante no projeto e explicar seu funcionamento.*
 
@@ -67,18 +68,18 @@ Implementei os serviços de faturamento, fidelidade e recomendação, os modelos
 ## 5. Funcionalidades Implementadas e Pendentes (Seção 8)
 
 ### 5.1 Funcionalidades Concluídas
-- [ ] Cadastro de clientes (`Regular`/`VIP`), consultores (`Financeiro`, `Gestão`, `TI`) e contratos. *(Confirmar com os responsáveis pelos módulos.)*
-- [ ] Alocação automática de consultores (menor carga, máx. 3 projetos ativos, prioridade VIP).
-- [ ] Gerenciamento de projetos em etapas com prazos, valores, detecção de atraso e cálculo de progresso.
-- [ ] Emissão de relatórios de desempenho (com seção extra de recomendações para clientes VIP).
+- [x] Cadastro de clientes (`Regular`/`VIP`), consultores (`Financeiro`, `Gestão`, `TI`) e contratos. *(Confirmar com os responsáveis pelos módulos.)*
+- [x] Alocação automática de consultores (menor carga, máx. 3 projetos ativos, prioridade VIP).
+- [x] Gerenciamento de projetos em etapas com prazos, valores, detecção de atraso e cálculo de progresso.
+- [x] Emissão de relatórios de desempenho (com seção extra de recomendações para clientes VIP).
 - [x] Faturamento por etapa concluída ou entrega final, com fatura detalhada, desconto VIP de 10% e registro do pagamento integral.
 - [x] Fidelidade (1 ponto por R$ 100 pagos, saldo parcial carregado, desconto de 5% por 100 pontos até 15%) e recomendações de especializações ausentes do histórico.
-- [ ] Persistência em arquivos (`CSV` / `JSON` / `TXT`) e tratamento de erros.
+- [x] Persistência em arquivos (`CSV` / `JSON` / `TXT`) e tratamento de erros.
 
 ### 5.2 Funcionalidades Não Concluídas e Justificativa
 
-- Os serviços de faturamento, fidelidade e recomendação estão implementados e cobertos por testes. O menu já permite demonstrá-los com adaptadores provisórios em memória; a substituição pelos modelos definitivos de contrato, projeto e etapa deve ser confirmada após a junção dos módulos.
-- A persistência em arquivos e a geração de relatórios PDF não estão configuradas no código-fonte atual. O desafio de integração com o Google Drive deve ser marcado como não realizado, salvo confirmação de outra implementação da equipe.
+- O menu integrado liga os contratos e projetos do domínio ao faturamento, às recomendações e aos relatórios. Os testes verificam o fluxo até o pagamento e a reabertura da base.
+- A persistência local em JSON, o backup e os relatórios PDF e CSV foram validados. O envio real ao Google Drive permanece opcional e requer uma conta autorizada.
 
 ---
 

@@ -5,15 +5,17 @@ import br.com.planilhacerta.integration.ContratoIntegracao;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 public class FidelidadeService {
     private static final int PONTOS_POR_BLOCO = 100;
     private static final int MAXIMO_BLOCOS = 3;
     private static final BigDecimal PERCENTUAL_POR_BLOCO = new BigDecimal("0.05");
 
-    private final Map<String, DescontoContrato> descontosPorContrato = new HashMap<>();
+    private final Map<String, DescontoReservado> descontosPorContrato = new HashMap<>();
 
     public synchronized void registrarPagamento(ClienteIntegracao cliente, BigDecimal valorPago) {
         Objects.requireNonNull(cliente, "cliente não pode ser nulo");
@@ -25,25 +27,30 @@ public class FidelidadeService {
     }
 
     public synchronized BigDecimal prepararDesconto(ContratoIntegracao contrato) {
+        return comDesconto(contrato, Function.identity());
+    }
+
+    synchronized <T> T comDesconto(ContratoIntegracao contrato, Function<BigDecimal, T> operacao) {
         Objects.requireNonNull(contrato, "contrato não pode ser nulo");
-        if (contrato.getId() == null || contrato.getId().isBlank()) {
+        String contratoId = contrato.getId();
+        if (contratoId == null || contratoId.isBlank()) {
             throw new IllegalArgumentException("O contrato deve possuir id");
         }
-        DescontoContrato descontoExistente = descontosPorContrato.get(contrato.getId());
-        if (descontoExistente != null) {
-            return descontoExistente.percentual();
+        DescontoReservado existente = descontosPorContrato.get(contratoId);
+        if (existente != null) {
+            return operacao.apply(existente.percentual());
         }
 
         ClienteIntegracao cliente = Objects.requireNonNull(contrato.getCliente(),
                 "O contrato deve possuir cliente");
-        int blocos = Math.min(cliente.getPontosFidelidade() / PONTOS_POR_BLOCO, MAXIMO_BLOCOS);
-        int pontosResgatados = blocos * PONTOS_POR_BLOCO;
-        BigDecimal percentual = PERCENTUAL_POR_BLOCO.multiply(BigDecimal.valueOf(blocos));
-        if (pontosResgatados > 0) {
-            cliente.resgatarPontosFidelidade(pontosResgatados);
+        int pontos = calcularBlocosDisponiveis(cliente) * PONTOS_POR_BLOCO;
+        DescontoReservado desconto = new DescontoReservado(contratoId, pontos);
+        T resultado = operacao.apply(desconto.percentual());
+        if (pontos > 0) {
+            cliente.resgatarPontosFidelidade(pontos);
         }
-        descontosPorContrato.put(contrato.getId(), new DescontoContrato(percentual, pontosResgatados));
-        return percentual;
+        descontosPorContrato.put(contratoId, desconto);
+        return resultado;
     }
 
     public synchronized BigDecimal registrarNovoContrato(ContratoIntegracao contrato) {
@@ -52,15 +59,41 @@ public class FidelidadeService {
 
     public synchronized BigDecimal calcularDescontoDisponivel(ClienteIntegracao cliente) {
         Objects.requireNonNull(cliente, "cliente não pode ser nulo");
-        int blocos = Math.min(cliente.getPontosFidelidade() / PONTOS_POR_BLOCO, MAXIMO_BLOCOS);
-        return PERCENTUAL_POR_BLOCO.multiply(BigDecimal.valueOf(blocos));
+        return PERCENTUAL_POR_BLOCO.multiply(BigDecimal.valueOf(calcularBlocosDisponiveis(cliente)));
     }
 
     public synchronized int getPontosResgatados(String contratoId) {
-        DescontoContrato desconto = descontosPorContrato.get(contratoId);
+        DescontoReservado desconto = descontosPorContrato.get(contratoId);
         return desconto == null ? 0 : desconto.pontosResgatados();
     }
 
-    private record DescontoContrato(BigDecimal percentual, int pontosResgatados) {
+    synchronized List<DescontoReservado> exportarDescontos() {
+        return List.copyOf(descontosPorContrato.values());
+    }
+
+    synchronized void restaurarDescontos(Map<String, DescontoReservado> descontos) {
+        descontosPorContrato.clear();
+        descontosPorContrato.putAll(descontos);
+    }
+
+    private static int calcularBlocosDisponiveis(ClienteIntegracao cliente) {
+        return Math.min(cliente.getPontosFidelidade() / PONTOS_POR_BLOCO, MAXIMO_BLOCOS);
+    }
+
+    public record DescontoReservado(String contratoId, int pontosResgatados) {
+        public DescontoReservado {
+            if (contratoId == null || contratoId.isBlank()) {
+                throw new IllegalArgumentException("O contrato deve possuir id");
+            }
+            int maximoPontos = MAXIMO_BLOCOS * PONTOS_POR_BLOCO;
+            if (pontosResgatados < 0 || pontosResgatados > maximoPontos
+                    || pontosResgatados % PONTOS_POR_BLOCO != 0) {
+                throw new IllegalArgumentException("Reserva de pontos inválida para o contrato " + contratoId);
+            }
+        }
+
+        public BigDecimal percentual() {
+            return PERCENTUAL_POR_BLOCO.multiply(BigDecimal.valueOf(pontosResgatados / PONTOS_POR_BLOCO));
+        }
     }
 }

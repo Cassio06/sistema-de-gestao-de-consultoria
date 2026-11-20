@@ -11,8 +11,8 @@ public class TesteProjetos {
 
     public static void main(String[] args) {
 
-        // Data fixa para reproduzir os testes
-        LocalDate hoje = LocalDate.of(2026, 11, 19);
+        // Datas relativas para repetir o cenário em qualquer dia.
+        LocalDate hoje = LocalDate.now();
 
         // Lista de projetos
         List<Projeto> projetos = new ArrayList<>();
@@ -22,25 +22,25 @@ public class TesteProjetos {
                 1, 101, 201,
                 "Consultoria Financeira",
                 "Organização financeira empresarial",
-                LocalDate.of(2026, 11, 1),
-                LocalDate.of(2026, 11, 30)
+                hoje.minusDays(18),
+                hoje.plusDays(11)
         );
 
         Etapa analise1 = new Etapa(
                 "Análise inicial",
-                LocalDate.of(2026, 11, 10),
+                hoje.minusDays(9),
                 new BigDecimal("500.00")
         );
 
         Etapa implementacao1 = new Etapa(
                 "Implementação",
-                LocalDate.of(2026, 11, 21),
+                hoje.plusDays(2),
                 new BigDecimal("1000.00")
         );
 
         Etapa revisao1 = new Etapa(
                 "Revisão final",
-                LocalDate.of(2026, 11, 28),
+                hoje.plusDays(9),
                 new BigDecimal("500.00")
         );
 
@@ -48,7 +48,7 @@ public class TesteProjetos {
         projeto1.adicionarEtapa(implementacao1);
         projeto1.adicionarEtapa(revisao1);
 
-        analise1.concluir(LocalDate.of(2026, 11, 9));
+        analise1.concluir(hoje.minusDays(10));
         implementacao1.iniciar();
 
         projetos.add(projeto1);
@@ -58,25 +58,25 @@ public class TesteProjetos {
                 2, 102, 202,
                 "Consultoria em TI",
                 "Modernização de sistemas",
-                LocalDate.of(2026, 11, 1),
-                LocalDate.of(2026, 11, 30)
+                hoje.minusDays(18),
+                hoje.plusDays(11)
         );
 
         Etapa analise2 = new Etapa(
                 "Análise inicial",
-                LocalDate.of(2026, 11, 5),
+                hoje.minusDays(14),
                 new BigDecimal("700.00")
         );
 
         Etapa implementacao2 = new Etapa(
                 "Implementação",
-                LocalDate.of(2026, 11, 12),
+                hoje.minusDays(7),
                 new BigDecimal("1500.00")
         );
 
         Etapa revisao2 = new Etapa(
                 "Revisão final",
-                LocalDate.of(2026, 11, 25),
+                hoje.plusDays(6),
                 new BigDecimal("800.00")
         );
 
@@ -84,7 +84,7 @@ public class TesteProjetos {
         projeto2.adicionarEtapa(implementacao2);
         projeto2.adicionarEtapa(revisao2);
 
-        analise2.concluir(LocalDate.of(2026, 11, 5));
+        analise2.concluir(hoje.minusDays(14));
         implementacao2.iniciar();
 
         projetos.add(projeto2);
@@ -94,25 +94,25 @@ public class TesteProjetos {
                 3, 103, 203,
                 "Consultoria de Gestão",
                 "Melhoria dos processos internos",
-                LocalDate.of(2026, 11, 1),
-                LocalDate.of(2026, 11, 18)
+                hoje.minusDays(18),
+                hoje.minusDays(1)
         );
 
         Etapa analise3 = new Etapa(
                 "Análise inicial",
-                LocalDate.of(2026, 11, 5),
+                hoje.minusDays(14),
                 new BigDecimal("400.00")
         );
 
         Etapa implementacao3 = new Etapa(
                 "Implementação",
-                LocalDate.of(2026, 11, 12),
+                hoje.minusDays(7),
                 new BigDecimal("800.00")
         );
 
         Etapa revisao3 = new Etapa(
                 "Revisão final",
-                LocalDate.of(2026, 11, 18),
+                hoje.minusDays(1),
                 new BigDecimal("400.00")
         );
 
@@ -120,9 +120,9 @@ public class TesteProjetos {
         projeto3.adicionarEtapa(implementacao3);
         projeto3.adicionarEtapa(revisao3);
 
-        analise3.concluir(LocalDate.of(2026, 11, 4));
-        implementacao3.concluir(LocalDate.of(2026, 11, 11));
-        revisao3.concluir(LocalDate.of(2026, 11, 18));
+        analise3.concluir(hoje.minusDays(15));
+        implementacao3.concluir(hoje.minusDays(8));
+        revisao3.concluir(hoje.minusDays(1));
 
         projetos.add(projeto3);
 
@@ -156,7 +156,7 @@ public class TesteProjetos {
                     hoje,
                     new BigDecimal("-100")
             );
-            System.out.println("[FALHOU] Valor negativo");
+            throw new AssertionError("Valor negativo");
         } catch (IllegalArgumentException e) {
             System.out.println("[OK] Valor negativo");
         }
@@ -167,14 +167,14 @@ public class TesteProjetos {
                     99, 101, 201,
                     "Projeto com quatro etapas",
                     "Teste de quantidade de etapas",
-                    LocalDate.of(2026, 11, 1),
-                    LocalDate.of(2026, 11, 30)
+                    hoje.minusDays(18),
+                    hoje.plusDays(11)
             );
 
             for (int i = 1; i <= 4; i++) {
                 Etapa etapa = new Etapa(
                         "Etapa " + i,
-                        LocalDate.of(2026, 11, 20 + i),
+                        hoje.plusDays(i + 1),
                         new BigDecimal("100.00")
                 );
 
@@ -184,17 +184,16 @@ public class TesteProjetos {
             if (projetoTeste.getEtapas().size() == 4) {
                 System.out.println("[OK] Projeto aceita quatro etapas");
             } else {
-                System.out.println("[FALHOU] Projeto aceita quatro etapas");
+                throw new AssertionError("Projeto aceita quatro etapas");
             }
 
         } catch (Exception e) {
-            System.out.println("[FALHOU] Projeto aceita quatro etapas");
-            System.out.println("Motivo: " + e.getMessage());
+            throw new AssertionError("O projeto deveria aceitar quatro etapas.", e);
         }
 
         try {
             analise1.concluir(hoje);
-            System.out.println("[FALHOU] Conclusão duplicada");
+            throw new AssertionError("Conclusão duplicada");
         } catch (IllegalStateException e) {
             System.out.println("[OK] Conclusão duplicada");
         }
