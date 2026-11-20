@@ -1,37 +1,54 @@
-# Ambiente de Trabalho — Branch `Arthur`
+# Modulo de Projetos, Etapas e Prazos — Branch Arthur
 
-**Responsável:** Artur Henrique Da Silva Alencar  
-**Módulo:** Projetos, Etapas e Prazos
+## Responsabilidade
 
----
+Implementacao do gerenciamento de projetos e etapas do sistema Planilha Certa.
 
-## 🎯 Escopo de Responsabilidades
+## Funcionalidades implementadas
 
-1. **Gerenciamento de Projetos e Divisão em Etapas:**
-   - Estruturar cada projeto em etapas (ex.: *análise inicial*, *implementação*, *revisão final*), cada uma com prazo (`LocalDate`) e valor (`BigDecimal`) definidos.
-2. **Controle de Status e Verificação de Prazos:**
-   - Controlar os status de cada etapa: `Pendente`, `Em andamento`, `Concluída`.
-   - Implementar a regra automática que altera o status para `Atrasada` caso a etapa não esteja concluída após a data de prazo estipulada.
-3. **Cálculo Automático de Progresso:**
-   - Calcular o progresso do projeto pela fórmula:
-     $$\text{Progresso} = \frac{\text{Etapas Concluídas}}{\text{Total de Etapas}}$$
+- Cadastro de projetos com identificadores de cliente e consultor.
+- Cadastro de etapas com nome, prazo e valor.
+- Controle de status: PENDENTE, EM_ANDAMENTO, CONCLUIDA e ATRASADA.
+- Identificacao automatica de etapas atrasadas.
+- Calculo percentual do progresso dos projetos.
+- Calculo do valor total das etapas.
+- Validacao de prazos e valores.
+- Bloqueio de nomes duplicados dentro de um projeto.
+- Bloqueio do compartilhamento da mesma instancia de etapa entre projetos.
+- Suporte a projetos com diferentes quantidades de etapas.
+- Monitoramento de prazos com alertas de vencimento.
+- Painel de desempenho com progresso medio e indicadores dos projetos.
 
----
+## Arquivos implementados
 
-## 📂 Arquivos Planejados para esta Branch (Sem código ainda)
+### Codigo principal
 
-### Pacote `src/main/java/br/com/planilhacerta/model/`
-- [ ] `StatusEtapa.java` *(enum: `PENDENTE`, `EM_ANDAMENTO`, `CONCLUIDA`, `ATRASADA`)*
-- [ ] `Etapa.java` *(classe com nome/descrição, prazo, valor, status e método de verificação de atraso)*
-- [ ] `Projeto.java` *(classe com lista de etapas, consultor alocado, especialização exigida e cálculo de progresso)*
+- src/main/java/br/com/planilhacerta/projetos/StatusEtapa.java
+- src/main/java/br/com/planilhacerta/projetos/Etapa.java
+- src/main/java/br/com/planilhacerta/projetos/Projeto.java
+- src/main/java/br/com/planilhacerta/projetos/MonitoramentoProjetos.java
+- src/main/java/Main.java
 
-### Pacote `src/main/java/br/com/planilhacerta/service/`
-- [ ] `ProjetoService.java` *(gerenciamento de projetos, adição/edição de etapas, atualização de status, verificação de atrasos por data e consulta de percentual de conclusão)*
+### Testes
 
----
+- src/test/java/br/com/planilhacerta/projetos/TesteProjetos.java
+- src/test/java/br/com/planilhacerta/projetos/TesteAvancadoProjetos.java
 
-## 🤝 Pontos de Integração com a Equipe
+## Testes realizados
 
-- **Com `Cassio` (Core e Alocação):** `Projeto` recebe o `Consultor` selecionado pelo `AlocacaoService` e compõe o `Contrato` do `Cliente`.
-- **Com `Cezar` (Faturamento):** A conclusão de uma `Etapa` ou de todas as etapas do `Projeto` dispara a geração de faturas (`POR_ETAPA` ou `ENTREGA_FINAL`).
-- **Com `Lukas` (Relatórios e Persistência):** O progresso do projeto e o detalhamento de cada etapa (status e prazo) alimentam os relatórios de desempenho em console e PDF.
+Compilacao realizada com Java 17.
+
+- 3 verificacoes principais aprovadas.
+- 13 verificacoes avancadas aprovadas.
+- Demonstracao pelo Main executada corretamente.
+
+## Integracao com os colegas
+
+A integracao definitiva com os modulos de clientes, consultores,
+contratos, faturamento, persistencia e relatorios ainda esta pendente.
+
+Atualmente, Projeto utiliza identificadores numericos de cliente
+e consultor, sem dependencia direta das classes dos colegas.
+
+O monitoramento e o painel de desempenho funcionam como
+demonstracao independente em console.

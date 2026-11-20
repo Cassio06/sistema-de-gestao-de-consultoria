@@ -134,7 +134,7 @@ sistema-de-gestao-de-consultoria/
    javac -d out $(find src/main/java -name "*.java")
 
    # Executar a aplicação principal
-   java -cp out br.com.planilhacerta.Main
+   java -cp out Main
    ```
    *(Caso o grupo adote Maven ou Gradle na etapa de codificação, os comandos `mvn compile exec:java` ou `./gradlew run` serão atualizados nesta seção).*
 
