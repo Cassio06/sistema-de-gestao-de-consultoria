@@ -25,7 +25,7 @@ O JAR abre o menu integrado. A opção **9** carrega dados fictícios. Use **6**
 Para rodar a demonstração em uma base separada, informe os diretórios antes de `-jar`, por exemplo:
 
 ```text
-java -Dconsultoria.dados=data-demo -Dconsultoria.relatorios=relatorios-demo -jar target/planilha-certa.jar
+java "-Dconsultoria.dados=data-demo" "-Dconsultoria.relatorios=relatorios-demo" -jar target/planilha-certa.jar
 ```
 
 No Windows, `.\run.ps1 -Test` também roda os executáveis de regressão das branches.
