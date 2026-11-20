@@ -3,11 +3,14 @@ package br.com.planilhacerta.view;
 import br.com.planilhacerta.model.Cliente;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class GerenciadorClientes {
     private final List<Cliente> clientes = new ArrayList<>();
+    private final Set<String> idsUtilizados = new HashSet<>();
     private final Scanner scanner;
 
     public GerenciadorClientes() {
@@ -20,7 +23,11 @@ public class GerenciadorClientes {
 
     public void cadastrar() {
         System.out.print("ID do Cliente: ");
-        String id = scanner.nextLine();
+        String id = scanner.nextLine().trim();
+        if (id.isEmpty() || idsUtilizados.contains(id)) {
+            System.out.println("ID vazio ou já utilizado.");
+            return;
+        }
         System.out.print("Nome: ");
         String nome = scanner.nextLine();
         System.out.print("E-mail: ");
@@ -31,6 +38,7 @@ public class GerenciadorClientes {
         boolean vip = scanner.nextLine().trim().equalsIgnoreCase("s");
 
         clientes.add(new Cliente(id, nome, email, empresa, vip));
+        idsUtilizados.add(id);
         System.out.println("-> Cliente cadastrado com sucesso!");
     }
 

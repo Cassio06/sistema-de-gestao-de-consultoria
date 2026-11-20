@@ -90,7 +90,6 @@ sistema-de-gestao-de-consultoria/
 │   │   ├── repository/                      # Persistência em arquivos (CSV/JSON/TXT)
 │   │   │   └── README.md
 │   │   ├── service/                         # Regras de negócio (alocação, faturamento, fidelidade)
-<<<<<<< HEAD
 │   │   ├── view/                            # Menu e gerenciadores do console
 │   │   └── util/                            # Utilitários, validadores, gerador de PDF e exceções
 │   └── test/java/br/com/planilhacerta/      # Testes executáveis das regras
@@ -98,33 +97,6 @@ sistema-de-gestao-de-consultoria/
 ├── .gitignore                               # Arquivos ignorados pelo Git
 ├── run.ps1                                  # Compila e inicia o menu ou executa os testes
 ├── README.md                                # Documentação principal do projeto
-=======
-│   │   │   └── README.md
-│   │   ├── util/                            # Utilitários, validadores, gerador de PDF e exceções
-│   │   │   └── README.md
-│   │   └── view/                            # Interface com o usuário (Console / Desktop / Web)
-│   │       └── README.md
-│   └── test/java/br/com/planilhacerta/       # Testes unitários e de integração planejados
-│       └── README.md
-├── .env.example                             # Exemplo de variáveis de ambiente (ex.: integração Google Drive)
-├── .gitignore                               # Arquivos ignorados pelo Git
-├── Cliente.class
-├── Cliente.java
-├── Consultor.class
-├── Consultor.java
-├── ESCOPO_CEZAR.md
-├── GerenciadorClientes.class
-├── GerenciadorClientes.java
-├── GerenciadorConsultores.class
-├── GerenciadorConsultores.java
-├── Main.java
-├── Pessoa.class
-├── Pessoa.java
-├── main.class
-├── README.md                                # Documentação principal do projeto
-├── S10a - Gestão de Consultoria.docx.pdf    # Enunciado específico da equipe
-└── Trabalho P2.pdf                          # Diretrizes gerais e critérios de avaliação da P2
->>>>>>> bcb3230c6ca31bbb350c3a51f6951675350f1c08
 ```
 
 ---
@@ -143,7 +115,7 @@ sistema-de-gestao-de-consultoria/
 ## Como Executar
 
 1. **Pré-requisitos:**
-   - Java JDK instalado (versão a confirmar pelo grupo; sugestão: 17 ou superior).
+   - Java JDK 17 ou superior.
    - Git instalado.
 2. **Clone o repositório e entre na pasta do projeto.**
    ```bash
@@ -152,21 +124,11 @@ sistema-de-gestao-de-consultoria/
    ```
 3. **Configuração de ambiente (opcional):**
    - Copie o arquivo `.env.example` para `.env` caso utilize credenciais externas (como API do Google Drive).
-<<<<<<< HEAD
-3. **Iniciar o menu (PowerShell, JDK 17+):**
+4. **Iniciar o menu (PowerShell, JDK 17+):**
    ```powershell
    .\run.ps1
-=======
-4. **Compilação e execução (prevista):**
-   ```bash
-   # Compilar os arquivos Java (quando implementados)
-   javac -d out $(find src/main/java -name "*.java")
-
-   # Executar a aplicação principal
-   java -cp out br.com.planilhacerta.Main
->>>>>>> bcb3230c6ca31bbb350c3a51f6951675350f1c08
    ```
-4. **Executar os testes do módulo:**
+5. **Executar os testes do módulo:**
    ```powershell
    .\run.ps1 -Test
    ```

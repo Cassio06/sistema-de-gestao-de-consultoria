@@ -23,7 +23,7 @@ public class FaturamentoService {
 
     private final FidelidadeService fidelidadeService;
     private final Map<String, Fatura> faturasPorId = new HashMap<>();
-    private final Map<String, String> faturasPorCobranca = new HashMap<>();
+    private final Map<ChaveCobranca, String> faturasPorCobranca = new HashMap<>();
     private final Map<String, Pagamento> pagamentosPorFatura = new HashMap<>();
     private final Map<String, ContratoIntegracao> contratosPorId = new HashMap<>();
 
@@ -49,7 +49,7 @@ public class FaturamentoService {
             throw new IllegalStateException("Só é possível faturar etapas concluídas");
         }
 
-        String chaveCobranca = "ETAPA:" + contrato.getId() + ":" + etapa.getId();
+        ChaveCobranca chaveCobranca = new ChaveCobranca(contrato.getId(), etapa.getId(), false);
         Fatura existente = obterFaturaExistente(chaveCobranca);
         if (existente != null) {
             return existente;
@@ -72,7 +72,7 @@ public class FaturamentoService {
             throw new IllegalStateException("A entrega final exige todas as etapas concluídas");
         }
 
-        String chaveCobranca = "ENTREGA:" + contrato.getId();
+        ChaveCobranca chaveCobranca = new ChaveCobranca(contrato.getId(), null, true);
         Fatura existente = obterFaturaExistente(chaveCobranca);
         if (existente != null) {
             return existente;
@@ -125,7 +125,7 @@ public class FaturamentoService {
     }
 
     private Fatura criarFatura(ContratoIntegracao contrato, List<FaturaItem> itens,
-                               String chaveCobranca, LocalDate dataEmissao) {
+                               ChaveCobranca chaveCobranca, LocalDate dataEmissao) {
         BigDecimal valorBruto = itens.stream().map(FaturaItem::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal descontoVip = contrato.getCliente().isVip()
@@ -142,9 +142,12 @@ public class FaturamentoService {
         return fatura;
     }
 
-    private Fatura obterFaturaExistente(String chaveCobranca) {
+    private Fatura obterFaturaExistente(ChaveCobranca chaveCobranca) {
         String faturaId = faturasPorCobranca.get(chaveCobranca);
         return faturaId == null ? null : faturasPorId.get(faturaId);
+    }
+
+    private record ChaveCobranca(String contratoId, String etapaId, boolean entregaFinal) {
     }
 
     private static BigDecimal calcularDesconto(BigDecimal base, BigDecimal percentual) {

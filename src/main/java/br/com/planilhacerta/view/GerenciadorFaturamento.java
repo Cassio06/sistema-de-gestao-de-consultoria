@@ -12,6 +12,7 @@ import br.com.planilhacerta.service.FidelidadeService;
 import br.com.planilhacerta.service.RecomendacaoService;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -348,14 +349,16 @@ public class GerenciadorFaturamento {
             System.out.print(prompt);
             try {
                 BigDecimal valor = new BigDecimal(scanner.nextLine().trim().replace(',', '.'));
-                if (valor.signum() >= 0) {
-                    return valor;
+                if (valor.signum() < 0) {
+                    System.out.println("O valor não pode ser negativo.");
+                    continue;
                 }
+                return valor.setScale(2, RoundingMode.UNNECESSARY);
             } catch (NumberFormatException erro) {
                 System.out.println("Digite um valor monetário válido.");
-                continue;
+            } catch (ArithmeticException erro) {
+                System.out.println("O valor deve ter no máximo duas casas decimais.");
             }
-            System.out.println("O valor não pode ser negativo.");
         }
     }
 

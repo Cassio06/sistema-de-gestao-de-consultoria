@@ -11,6 +11,7 @@ import br.com.planilhacerta.model.Cliente;
 import br.com.planilhacerta.service.FaturamentoService;
 import br.com.planilhacerta.service.FidelidadeService;
 import br.com.planilhacerta.service.RecomendacaoService;
+import br.com.planilhacerta.view.GerenciadorClientes;
 import br.com.planilhacerta.view.Main;
 
 import java.io.ByteArrayInputStream;
@@ -22,19 +23,23 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class RegrasFaturamentoFidelidadeRecomendacaoTest {
     private static final LocalDate HOJE = LocalDate.of(2026, 11, 16);
 
     public static void main(String[] args) {
         testaFaturamentoPorEtapaEDuplicidade();
+        testaChavesDeCobrancaSemColisoes();
         testaFaturamentoFinal();
         testaDescontosVipEFidelidade();
         testaDescontoDeFidelidadeDistribuidoEntreEtapas();
         testaAcumuloDePontosEResgateComTeto();
         testaClienteDoMenuIntegradoAoProgramaDeFidelidade();
+        testaIdDeClienteNaoPodeSerReutilizado();
         testaRecomendacoesParaHistoricoERelatorioVip();
         testaFluxoDeFaturamentoNoMenu();
+        testaMenuRejeitaFracaoDeCentavo();
         System.out.println("Todos os testes de faturamento, fidelidade e recomendação passaram.");
     }
 
@@ -82,6 +87,30 @@ public class RegrasFaturamentoFidelidadeRecomendacaoTest {
                 "O valor final deve somar o valor de todas as etapas");
         verificar(service.gerarFaturaEntregaFinal(contrato, HOJE) == fatura,
                 "A entrega final não deve gerar uma cobrança duplicada");
+    }
+
+    private static void testaChavesDeCobrancaSemColisoes() {
+        ClienteFake ana = new ClienteFake("ana", false);
+        ClienteFake bruno = new ClienteFake("bruno", false);
+        ContratoFake contratoAna = contrato("contrato:ana", ana, ModalidadePagamento.POR_ETAPA,
+                Especializacao.FINANCEIRO,
+                new EtapaFake("etapa", "Etapa da Ana", "1000.00", true));
+        ContratoFake contratoBruno = contrato("contrato", bruno, ModalidadePagamento.POR_ETAPA,
+                Especializacao.GESTAO,
+                new EtapaFake("ana:etapa", "Etapa do Bruno", "2000.00", true));
+        FaturamentoService service = new FaturamentoService();
+
+        Fatura faturaAna = service.gerarFaturaPorEtapa(contratoAna, "etapa", HOJE);
+        Fatura faturaBruno = service.gerarFaturaPorEtapa(contratoBruno, "ana:etapa", HOJE);
+
+        verificar(faturaAna != faturaBruno, "Cobranças distintas não devem compartilhar fatura");
+        verificar(faturaAna.getValorBruto().compareTo(new BigDecimal("1000.00")) == 0,
+                "A fatura da Ana deve manter o valor da própria etapa");
+        verificar(faturaBruno.getValorBruto().compareTo(new BigDecimal("2000.00")) == 0,
+                "A fatura do Bruno deve manter o valor da própria etapa");
+        service.registrarPagamento(faturaBruno.getId(), faturaBruno.getValorLiquido(), HOJE);
+        verificar(bruno.pontos == 20 && ana.pontos == 0,
+                "O pagamento deve creditar fidelidade ao cliente do contrato correspondente");
     }
 
     private static void testaDescontosVipEFidelidade() {
@@ -205,6 +234,25 @@ public class RegrasFaturamentoFidelidadeRecomendacaoTest {
                 "O saldo parcial para o próximo ponto deve permanecer no cliente");
     }
 
+    private static void testaIdDeClienteNaoPodeSerReutilizado() {
+        String entrada = String.join("\n",
+                "cliente-unico", "Ana", "ana@example.com", "Empresa", "n",
+                "cliente-unico",
+                "cliente-unico",
+                "cliente-unico",
+                "");
+        GerenciadorClientes gerenciador = new GerenciadorClientes(
+                new Scanner(new ByteArrayInputStream(entrada.getBytes(StandardCharsets.UTF_8))));
+
+        gerenciador.cadastrar();
+        gerenciador.cadastrar();
+        gerenciador.remover();
+        gerenciador.cadastrar();
+
+        verificar(gerenciador.getClientes().isEmpty(),
+                "Um ID já usado não deve voltar a identificar outro cliente após remoção");
+    }
+
     private static void testaFluxoDeFaturamentoNoMenu() {
         String entrada = String.join("\n",
                 "1", "cliente-menu-vip", "Cliente VIP", "vip@example.com", "Empresa", "s",
@@ -235,6 +283,34 @@ public class RegrasFaturamentoFidelidadeRecomendacaoTest {
                 "O menu deve creditar pontos após o pagamento");
         verificar(resultado.contains("Especializações recomendadas: [GESTAO, TI]"),
                 "O menu deve consultar recomendações para cliente VIP");
+    }
+
+    private static void testaMenuRejeitaFracaoDeCentavo() {
+        String entrada = String.join("\n",
+                "1", "cliente-centavo", "Cliente Centavo", "centavo@example.com", "Empresa", "n",
+                "9", "cliente-centavo", "contrato-centavo", "1", "1", "1",
+                "etapa-centavo", "Diagnóstico", "0.001", "0.01",
+                "11", "contrato-centavo", "etapa-centavo",
+                "12", "contrato-centavo", "etapa-centavo", "s",
+                "0", "");
+        ByteArrayOutputStream saida = new ByteArrayOutputStream();
+        InputStream entradaOriginal = System.in;
+        PrintStream saidaOriginal = System.out;
+        try {
+            System.setIn(new ByteArrayInputStream(entrada.getBytes(StandardCharsets.UTF_8)));
+            System.setOut(new PrintStream(saida, true, StandardCharsets.UTF_8));
+            Main.main(new String[0]);
+        } finally {
+            System.setIn(entradaOriginal);
+            System.setOut(saidaOriginal);
+        }
+
+        String resultado = saida.toString(StandardCharsets.UTF_8);
+        verificar(resultado.contains("O valor deve ter no máximo duas casas decimais."),
+                "O menu deve rejeitar valores com frações de centavo");
+        verificar(resultado.contains("Subtotal: R$ 0.01")
+                        && resultado.contains("Pagamento registrado: R$ 0.01"),
+                "O menu deve emitir e pagar usando o valor monetário válido informado em seguida");
     }
 
     private static ContratoFake contrato(String id, ClienteFake cliente, ModalidadePagamento modalidade,
