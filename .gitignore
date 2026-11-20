@@ -4,6 +4,8 @@ target/
 *.iml
 dados_planilha_certa.json
 dados_planilha_certa.bak.json
+data/dados-corrompidos-*.json
+data/dados.lock
 relatorio_planilha_certa.csv
 relatorios_pdf/
 credentials.json

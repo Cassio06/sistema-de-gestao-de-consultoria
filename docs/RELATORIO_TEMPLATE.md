@@ -1,8 +1,9 @@
 # Roteiro do Relatório Final e Apresentação — Trabalho da P2
 
 > **Instruções de Entrega (conforme `Trabalho P2.pdf`):**
-> - O relatório final deve ser entregue em formato **PDF** no dia anterior à apresentação (apresentações nos dias **23 e 26 de novembro**, conforme cronograma).
-> - Extensão mínima exigida: **4 páginas**.
+> - Cada equipe entrega **um único PDF** no dia anterior à apresentação (dias **23 e 26 de novembro**, conforme cronograma).
+> - O relatório da equipe deve ter **pelo menos 4 páginas no total**.
+> - A contribuição e a experiência de cada integrante entram em uma seção do mesmo documento. Cada pessoa registra o que fez, do que mais gostou, as dificuldades e o que aprendeu.
 > - Este arquivo serve como esqueleto/template para a redação do documento final da equipe.
 > - A seção 6 do edital (6.1 a 6.5) descreve a **apresentação oral**; seus tópicos foram incluídos aqui como roteiro, junto com os itens obrigatórios do relatório (seção 8).
 
@@ -31,7 +32,7 @@
 
 ## 3. Contribuição Individual de Cada Integrante (Seção 8)
 
-*(Detalhar o que cada integrante desenvolveu no projeto)*
+*(Cada integrante deve completar sua seção com o relato pessoal da experiência no projeto.)*
 
 | Integrante | Branch | Responsabilidades e Contribuições no Projeto |
 | :--- | :--- | :--- |
@@ -39,6 +40,14 @@
 | **Artur Henrique Da Silva Alencar** | `Arthur` | **Projetos, Etapas e Prazos:** Gerenciamento de projetos divididos em etapas (análise inicial, implementação, revisão final) com prazos e valores; controle de status das etapas (pendente, em andamento, concluída) e regra de marcação como atrasada; cálculo automático do progresso do projeto. |
 | **Cezar Gabriel de Souza Vicente Mendes** | `Cezar` | **Faturamento, Fidelidade e Recomendações:** Pagamento por etapa concluída ou entrega final e emissão de faturas detalhadas (10% de desconto automático para VIP); programa de fidelidade (1 ponto a cada R$ 100 pagos, 100 pontos = 5% de desconto até 15%); recomendação de especializações ainda não contratadas. |
 | **Lukas Souza Melo** | `Lukas` | **Persistência, Relatórios PDF e Interface/Erros:** Persistência de dados em arquivos (JSON, CSV ou TXT) e tentativa do desafio Google Drive; emissão de relatórios de desempenho (console e PDF com iText, incluindo recomendações para VIP); menu/interface principal e tratamento de erros. |
+
+### Lukas Souza Melo
+
+Lukas implementou a persistência em JSON, os relatórios de desempenho em PDF com iText e o menu de console (commit `cdf1389`). Também aprimorou a recuperação do backup e a validação de entradas (commit `caf1c96`). Na versão revisada, os relatórios no console e em PDF apresentam prazo, valor, status e progresso de cada etapa e incluem recomendações para clientes VIP. O progresso por etapa indica conclusão, com 100% para uma etapa concluída e 0% enquanto estiver em aberto.
+
+A demonstração usa dados fictícios para mostrar uma etapa concluída, uma atrasada e uma pendente, além da exportação em CSV e da recuperação dos dados ao reabrir o sistema. Na revisão, foram validados sete cenários de persistência, menu e relatórios. O backup opcional no Google Drive já tem configuração local e ainda depende de um teste com conta autorizada.
+
+*Relato pessoal a ser completado pelo Lukas com o que mais gostou de fazer, a principal dificuldade que enfrentou e o que aprendeu.*
 
 ---
 
@@ -50,8 +59,15 @@
   - **Encapsulamento:** Como as regras de limite de projetos por consultor, prazos de etapas e saldo de pontos foram protegidas.
   - **Herança:** Justificativa para a hierarquia de classes adotada (ex.: `ClienteRegular` e `ClienteVIP`).
   - **Polimorfismo:** Como descontos, prioridades e relatórios personalizados foram tratados polimorficamente.
-- **Classe de Destaque (Obrigatório no Relatório):**
-  - *Inserir aqui o trecho de código ou captura de tela (screenshot) de uma classe considerada importante no projeto e explicar seu funcionamento.*
+### Classe de destaque
+
+O trecho de [RelatorioService.java](../src/main/java/report/RelatorioService.java) abaixo transforma o status da etapa no percentual de conclusão exibido no console e no PDF.
+
+```java
+private static int progressoDaEtapa(StatusEtapa status) {
+    return status == StatusEtapa.CONCLUIDA ? 100 : 0;
+}
+```
 
 ### 4.1 Demonstração Prática do Sistema (Seção 6.3 — apresentação)
 - *Roteiro de demonstração com exemplos reais: cadastro de cliente VIP e Regular → criação de contrato/projeto → alocação automática de consultor → avanço/atraso de etapas e progresso → faturamento com descontos e pontos → relatório de desempenho (console/PDF) com recomendações.*

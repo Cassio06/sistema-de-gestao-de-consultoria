@@ -1,13 +1,12 @@
 # Diretório de Persistência (`data/`)
 
-Este diretório armazena os arquivos de dados utilizados pelo **Sistema de Gestão de Consultoria** (em formato `CSV`, `JSON` ou `TXT`, conforme exigido nas diretrizes do `Trabalho P2.pdf`).
+Este diretório armazena a base JSON e a exportação CSV do **Sistema de Gestão de Consultoria**.
 
-## Arquivos Previstos
-- `clientes.(csv|json|txt)` — Cadastro de clientes Regular e VIP, saldo de pontos de fidelidade e histórico.
-- `consultores.(csv|json|txt)` — Cadastro de consultores por especialização (`Financeiro`, `Gestão`, `TI`) e projetos alocados.
-- `contratos.(csv|json|txt)` — Contratos celebrados, prazos, valores e modalidade de pagamento.
-- `projetos.(csv|json|txt)` — Projetos, etapas, prazos, valores e status (`Pendente`, `Em andamento`, `Concluída`, `Atrasada`).
-- `faturas.(csv|json|txt)` — Registro de faturamentos por etapa ou entrega final e descontos aplicados.
-- `reports/` — Diretório destinado aos relatórios de desempenho exportados (ex.: arquivos PDF gerados com *iText*).
+## Arquivos gerados
 
-> **Nota sobre Tratamento de Erros:** O sistema deverá inicializar normalmente mesmo que estes arquivos ainda não existam, criando-os sob demanda.
+- `dados_planilha_certa.json` guarda os clientes, consultores, projetos e etapas disponíveis no menu.
+- `dados_planilha_certa.bak.json` guarda a versão anterior válida para recuperação.
+- `dados-corrompidos-*.json` preserva cópias do arquivo principal corrompido quando ele precisa ser substituído.
+- `relatorio_planilha_certa.csv` reúne os dados gerenciais dos projetos.
+
+Na ausência de arquivos válidos, o sistema inicia com uma base vazia. Os relatórios em PDF são gravados em `relatorios_pdf/`, na raiz.

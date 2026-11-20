@@ -13,6 +13,7 @@ public class MenuPrincipal {
     private final PersistenciaService persistencia;
     private final RelatorioService relatorioService;
     private BancoDados banco;
+    private boolean alteracoesPendentes;
 
     public MenuPrincipal() {
         this.persistencia = new PersistenciaService();
@@ -46,10 +47,12 @@ public class MenuPrincipal {
                 case 5 -> atualizarEtapa();
                 case 6 -> emitirRelatorio();
                 case 7 -> persistencia.exportarCSV(banco);
-                case 8 -> persistencia.salvarDados(banco);
+                case 8 -> salvarAlteracoes();
                 case 9 -> carregarModeloPrePronto();
                 case 0 -> {
-                    persistencia.salvarDados(banco);
+                    if (alteracoesPendentes && !salvarAlteracoes()) {
+                        System.out.println("[AVISO] Encerrando com alterações que não puderam ser gravadas.");
+                    }
                     System.out.println("Encerrando o sistema Planilha Certa. Até logo!");
                 }
             }
@@ -86,7 +89,7 @@ public class MenuPrincipal {
         Cliente novo = new Cliente(id, nome, email, telefone, tipo == 2);
         banco.clientes.add(novo);
 
-        if (persistencia.salvarDados(banco)) {
+        if (salvarAlteracoes()) {
             System.out.printf("Cliente '%s' (%s) cadastrado com ID %s!%n",
                     novo.getNome(), novo.getCategoriaTexto(), novo.getId());
         } else {
@@ -105,7 +108,7 @@ public class MenuPrincipal {
         Consultor novo = new Consultor(id, nome, email, telefone, esp);
         banco.consultores.add(novo);
 
-        if (persistencia.salvarDados(banco)) {
+        if (salvarAlteracoes()) {
             System.out.printf("Consultor '%s' (%s) cadastrado com ID %s!%n",
                     novo.getNome(), esp.getDescricao(), novo.getId());
         } else {
@@ -185,7 +188,7 @@ public class MenuPrincipal {
 
         banco.projetos.add(projeto);
 
-        if (persistencia.salvarDados(banco)) {
+        if (salvarAlteracoes()) {
             System.out.printf("Projeto '%s' criado! Consultor alocado automaticamente: %s.%n",
                     projeto.getTitulo(), consultor.getNome());
             System.out.printf("[CONTRATO & FATURAMENTO] Contrato CTR-%s gerado | Cliente: %s | Valor Total: R$ %.2f%n",
@@ -230,7 +233,7 @@ public class MenuPrincipal {
             }
         }
 
-        if (persistencia.salvarDados(banco)) {
+        if (salvarAlteracoes()) {
             System.out.println("Status da etapa atualizado com sucesso!");
         } else {
             System.out.println("[AVISO] Status atualizado em memória, mas houve falha ao gravar no arquivo.");
@@ -253,6 +256,10 @@ public class MenuPrincipal {
     }
 
     private void carregarModeloPrePronto() {
+        if (buscarClientePorId("CLI-DEMO1") != null) {
+            System.out.println("[AVISO] O cenário de demonstração já está cadastrado.");
+            return;
+        }
         Cliente cVip = new Cliente("CLI-DEMO1", "TechSolutions Ltda", "contato@techsolutions.com", "(86) 99999-0001", true);
         cVip.registrarEspecializacao(Especializacao.FINANCEIRO);
         cVip.adicionarPontos(120);
@@ -274,11 +281,16 @@ public class MenuPrincipal {
         banco.consultores.add(con1);
         banco.projetos.add(proj);
 
-        if (persistencia.salvarDados(banco)) {
+        if (salvarAlteracoes()) {
             System.out.println("[MODELO] Cenário pré-pronto carregado com sucesso (1 Cliente VIP, 1 Consultor e 1 Projeto com etapas)!");
         } else {
             System.out.println("[AVISO] Cenário carregado em memória, mas houve falha ao gravar no arquivo.");
         }
+    }
+
+    private boolean salvarAlteracoes() {
+        alteracoesPendentes = !persistencia.salvarDados(banco);
+        return !alteracoesPendentes;
     }
 
     private Especializacao escolherEspecializacao() {

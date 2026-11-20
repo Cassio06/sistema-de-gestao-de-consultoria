@@ -14,18 +14,34 @@ import model.ModelosSistema.*;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class RelatorioService {
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final String LEGENDA_PROGRESSO =
+            "O progresso por etapa indica conclusão (100% concluída e 0% em aberto).";
 
     // Cores legíveis para destaque visual no PDF
     private static final DeviceRgb COR_VERMELHO = new DeviceRgb(200, 30, 30);
     private static final DeviceRgb COR_VERDE = new DeviceRgb(22, 130, 56);
     private static final DeviceRgb COR_LARANJA = new DeviceRgb(204, 112, 0);
     private static final DeviceRgb COR_AZUL_VIP = new DeviceRgb(25, 85, 166);
+    private final Path diretorio;
+
+    public RelatorioService() {
+        this(Path.of("relatorios_pdf"));
+    }
+
+    public RelatorioService(Path diretorio) {
+        this.diretorio = diretorio;
+    }
 
     public void exibirRelatorioConsole(Projeto projeto, Cliente cliente, Consultor consultor) {
         System.out.println("\n=======================================================");
@@ -42,12 +58,15 @@ public class RelatorioService {
         System.out.println("ETAPAS DO PROJETO:");
 
         for (Etapa etapa : projeto.getEtapas()) {
-            System.out.printf(" - %-22s | Prazo: %s | R$ %8.2f | Status: %s%n",
+            StatusEtapa status = etapa.getStatusAtualizado();
+            System.out.printf(" - %-22s | Prazo: %s | R$ %8.2f | Status: %s | Progresso: %d%%%n",
                     etapa.getNome(),
                     etapa.getPrazo().format(FMT),
                     etapa.getValor(),
-                    etapa.getStatusAtualizado());
+                    status,
+                    progressoDaEtapa(status));
         }
+        System.out.println(LEGENDA_PROGRESSO);
 
         // Requisito: Seção adicional de recomendações apenas para clientes VIP
         if (cliente.isVip()) {
@@ -67,18 +86,30 @@ public class RelatorioService {
 
     public void gerarRelatorioPDF(Projeto projeto, Cliente cliente, Consultor consultor) {
         try {
-            File pasta = new File("relatorios_pdf");
-            if (!pasta.exists()) {
-                pasta.mkdirs();
+            String nome = String.format("Relatorio_%s_%s.pdf",
+                    sanitizarNomeArquivo(projeto.getId()), sanitizarNomeArquivo(cliente.getNome()));
+            Path destino = diretorio.resolve(nome);
+            Files.createDirectories(diretorio);
+            Path temporario = Files.createTempFile(diretorio, "relatorio-", ".tmp");
+            try {
+                escreverPDF(temporario, projeto, cliente, consultor);
+                try {
+                    Files.move(temporario, destino, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+                } catch (AtomicMoveNotSupportedException e) {
+                    Files.move(temporario, destino, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } finally {
+                Files.deleteIfExists(temporario);
             }
+            System.out.println("[PDF iText] Relatório gerado com sucesso em: " + destino);
+            abrirPdfNaTela(destino.toFile());
+        } catch (IOException | RuntimeException e) {
+            System.out.println("[ERRO PDF] Não foi possível gerar o PDF: " + e.getMessage());
+        }
+    }
 
-            String nomeArquivo = String.format("relatorios_pdf/Relatorio_%s_%s.pdf",
-                    projeto.getId(), sanitizarNomeArquivo(cliente.getNome()).replaceAll("\\s+", "_"));
-
-            PdfWriter writer = new PdfWriter(nomeArquivo);
-            PdfDocument pdf = new PdfDocument(writer);
-            Document document = new Document(pdf);
-
+    private void escreverPDF(Path arquivo, Projeto projeto, Cliente cliente, Consultor consultor) throws IOException {
+        try (Document document = new Document(new PdfDocument(new PdfWriter(arquivo.toString())))) {
             // Cabeçalho
             Paragraph titulo = new Paragraph("PLANILHA CERTA - CONSULTORIA EMPRESARIAL")
                     .setBold()
@@ -103,9 +134,10 @@ public class RelatorioService {
 
             // Tabela de Etapas com destaque colorido por status
             document.add(new Paragraph("Detalhamento das Etapas").setBold().setFontSize(12).setMarginBottom(5));
-            Table tabela = new Table(UnitValue.createPercentArray(new float[]{4, 2, 2, 2})).useAllAvailableWidth();
+            Table tabela = new Table(UnitValue.createPercentArray(new float[]{3.6f, 1.9f, 1.8f, 2.6f, 1.7f}))
+                    .useAllAvailableWidth();
 
-            String[] cabecalhos = {"Etapa", "Prazo", "Valor (R$)", "Status"};
+            String[] cabecalhos = {"Etapa", "Prazo", "Valor (R$)", "Status", "Progresso"};
             for (String h : cabecalhos) {
                 tabela.addHeaderCell(new Cell().add(new Paragraph(h).setBold())
                         .setBackgroundColor(ColorConstants.LIGHT_GRAY));
@@ -126,8 +158,10 @@ public class RelatorioService {
                     pStatus.setFontColor(COR_LARANJA);
                 }
                 tabela.addCell(new Cell().add(pStatus));
+                tabela.addCell(progressoDaEtapa(status) + "%");
             }
             document.add(tabela);
+            document.add(new Paragraph(LEGENDA_PROGRESSO).setFontSize(9).setMarginTop(4));
 
             // Seção Extra Exclusiva para VIP
             if (cliente.isVip()) {
@@ -151,16 +185,11 @@ public class RelatorioService {
                     .setFontSize(9)
                     .setFontColor(ColorConstants.GRAY)
                     .setTextAlignment(TextAlignment.RIGHT));
-
-            document.close();
-            System.out.println("[PDF iText] Relatório gerado com sucesso em: " + nomeArquivo);
-
-            // Abre o PDF automaticamente na tela para agilizar a demonstração ao vivo
-            abrirPdfNaTela(new File(nomeArquivo));
-
-        } catch (Exception e) {
-            System.out.println("[ERRO PDF] Não foi possível gerar o PDF: " + e.getMessage());
         }
+    }
+
+    private static int progressoDaEtapa(StatusEtapa status) {
+        return status == StatusEtapa.CONCLUIDA ? 100 : 0;
     }
 
     private void abrirPdfNaTela(File arquivoPdf) {
@@ -169,8 +198,8 @@ public class RelatorioService {
                 Desktop.getDesktop().open(arquivoPdf);
                 System.out.println("[PDF iText] Abrindo relatório automaticamente no visualizador padrão...");
             }
-        } catch (Throwable t) {
-            System.out.println("[INFO] Não foi possível abrir o PDF automaticamente. Acesse-o na pasta 'relatorios_pdf'.");
+        } catch (IOException | UnsupportedOperationException | SecurityException e) {
+            System.out.println("[INFO] Não foi possível abrir o PDF automaticamente. Acesse " + arquivoPdf);
         }
     }
 

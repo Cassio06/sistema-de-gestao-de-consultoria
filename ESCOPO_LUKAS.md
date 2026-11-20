@@ -19,26 +19,49 @@
 
 ---
 
-## 📂 Arquivos Planejados para esta Branch (Sem código ainda)
+## Entrega de Lukas Souza Melo
 
-### Pacote `src/main/java/br/com/planilhacerta/repository/`
-- [ ] `RepositorioArquivo.java` *(interface ou classe genérica para leitura/escrita em JSON, CSV ou TXT)*
-- [ ] `ClienteRepository.java`, `ConsultorRepository.java`, `ContratoRepository.java`, `ProjetoRepository.java`, `FaturaRepository.java`
-- [ ] `GoogleDriveSyncService.java` *(integração opcional do desafio extra para salvar os dados no Google Drive)*
+Lukas implementou a persistência local em JSON, os relatórios com iText e o menu principal no commit `cdf1389`. No commit `caf1c96`, aprimorou a recuperação do backup e a validação de entradas. A versão atual da branch reúne essa entrega e os ajustes de revisão.
 
-### Pacote `src/main/java/br/com/planilhacerta/util/`
-- [ ] `RelatorioDesempenhoGenerator.java` *(formatação no console e geração de PDF com iText, adicionando seção de recomendações para clientes VIP)*
-- [ ] `ValidadorEntrada.java` *(leitura segura de números, datas e textos no console sem lançar exceções não tratadas)*
-- [ ] `PersistenciaException.java` / `RegraNegocioException.java` *(exceções customizadas para tratamento limpo de erros)*
+| Componente | Implementação na branch |
+| :--- | :--- |
+| [PersistenciaService](src/main/java/persistence/PersistenciaService.java) | Lê e grava a base em `data/`, recupera o backup e exporta o CSV gerencial. |
+| [RelatorioService](src/main/java/report/RelatorioService.java) | Exibe o progresso geral e o prazo, status, valor e progresso de cada etapa no console e em PDF. A seção de recomendações aparece para clientes VIP. |
+| [MenuPrincipal](src/main/java/ui/MenuPrincipal.java) e [ConsoleHelper](src/main/java/util/ConsoleHelper.java) | Apresentam o menu, validam a entrada e carregam os dados fictícios da demonstração. |
+| [GoogleDriveService](src/main/java/persistence/GoogleDriveService.java) | Implementa o backup opcional conforme as opções do arquivo `.env`. O envio para uma conta real ainda depende de credenciais e validação. |
 
-### Pacote `src/main/java/br/com/planilhacerta/view/`
-- [ ] `MenuPrincipalView.java` *(fluxo de navegação entre Clientes, Consultores, Contratos, Projetos/Etapas, Faturamento e Relatórios)*
-- [ ] `Main.java` *(ponto de entrada do sistema com inicialização dos repositórios e tratamento global de erros)*
+A [contribuição individual resumida em PDF](docs/RELATORIO_LUKAS.pdf) acompanha a [seção editável no relatório da equipe](docs/RELATORIO_TEMPLATE.md#lukas-souza-melo). O mínimo de quatro páginas se aplica ao PDF completo do grupo.
+
+## Demonstração prática
+
+Na raiz da branch, compile com JDK 17 ou superior e Maven.
+
+```text
+mvn compile org.apache.maven.plugins:maven-dependency-plugin:3.8.1:copy-dependencies
+```
+
+No Windows, execute
+
+```powershell
+java -cp "target/classes;target/dependency/*" ui.MenuPrincipal
+```
+
+No Linux ou macOS, execute
+
+```bash
+java -cp "target/classes:target/dependency/*" ui.MenuPrincipal
+```
+
+1. Escolha **9** para carregar a demonstração, que contém um cliente VIP fictício, uma consultora e um projeto de reestruturação do fluxo de caixa.
+2. Escolha **6** e selecione o projeto. O relatório mostra cerca de 33% de progresso geral, com 100% na etapa concluída e 0% nas etapas em aberto. Confira os status, os prazos e as recomendações VIP no PDF em `relatorios_pdf/`.
+3. Escolha **7** para exportar a planilha gerencial em `data/`. Saia com **0** e abra o programa novamente para mostrar que os dados foram preservados.
+
+## Validação
+
+Os cenários de regressão cobrem recuperação de arquivos inconsistentes, migração do JSON legado, proteção contra sobrescrita por outra sessão, configuração local do Drive, respostas do menu e relatórios para clientes VIP e regulares.
 
 ---
 
-## 🤝 Pontos de Integração com a Equipe
+## Integração com a equipe
 
-- **Com `Cassio` (Core e Alocação):** Persiste e exibe no menu os cadastros de Clientes, Consultores, Contratos e a alocação automática.
-- **Com `Arthur` (Projetos e Etapas):** Persiste o estado dos projetos/etapas e consome o cálculo de progresso e prazos para gerar o Relatório de Desempenho.
-- **Com `Cezar` (Faturamento, Fidelidade e Recomendações):** Persiste as faturas, exibe descontos/pontos no menu e consome o `RecomendacaoService` para preencher a seção exclusiva de clientes VIP nos relatórios em PDF/console.
+Na reunião das branches, o menu, a persistência e os relatórios devem ser ligados às entidades e à alocação do Cássio, aos projetos e etapas do Arthur e aos serviços de faturamento, fidelidade e recomendações do Cezar. O roteiro acima cobre a demonstração do módulo de Lukas na branch atual.
