@@ -7,11 +7,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class GerenciadorClientes {
     private final List<Cliente> clientes = new ArrayList<>();
     private final Set<String> idsUtilizados = new HashSet<>();
     private final Scanner scanner;
+    private Predicate<Cliente> possuiContratoAtivo = cliente -> false;
 
     public GerenciadorClientes() {
         this(new Scanner(System.in));
@@ -23,19 +25,26 @@ public class GerenciadorClientes {
 
     public void cadastrar() {
         System.out.print("ID do Cliente: ");
-        String id = scanner.nextLine().trim();
+        String entrada = lerLinhaCadastro();
+        if (entrada == null) return;
+        String id = entrada.trim();
         if (id.isEmpty() || idsUtilizados.contains(id)) {
             System.out.println("ID vazio ou já utilizado.");
             return;
         }
         System.out.print("Nome: ");
-        String nome = scanner.nextLine();
+        String nome = lerLinhaCadastro();
+        if (nome == null) return;
         System.out.print("E-mail: ");
-        String email = scanner.nextLine();
+        String email = lerLinhaCadastro();
+        if (email == null) return;
         System.out.print("Empresa: ");
-        String empresa = scanner.nextLine();
+        String empresa = lerLinhaCadastro();
+        if (empresa == null) return;
         System.out.print("Cliente VIP? (s/n): ");
-        boolean vip = scanner.nextLine().trim().equalsIgnoreCase("s");
+        String respostaVip = lerLinhaCadastro();
+        if (respostaVip == null) return;
+        boolean vip = respostaVip.trim().equalsIgnoreCase("s");
 
         clientes.add(new Cliente(id, nome, email, empresa, vip));
         idsUtilizados.add(id);
@@ -82,11 +91,19 @@ public class GerenciadorClientes {
         String id = scanner.nextLine();
         Cliente c = buscarPorId(id);
         if (c != null) {
+            if (possuiContratoAtivo.test(c)) {
+                System.out.println("-> Cliente n\u00e3o pode ser removido: possui contrato ativo ou fatura pendente.");
+                return;
+            }
             clientes.remove(c);
             System.out.println("-> Cliente removido com sucesso!");
         } else {
             System.out.println("-> Cliente não encontrado.");
         }
+    }
+
+    void definirVerificadorDeContratoAtivo(Predicate<Cliente> verificador) {
+        this.possuiContratoAtivo = java.util.Objects.requireNonNull(verificador, "verificador");
     }
 
     public Cliente buscarPorId(String id) {
@@ -98,6 +115,15 @@ public class GerenciadorClientes {
 
     public List<Cliente> getClientes() {
         return List.copyOf(clientes);
+    }
+
+    private String lerLinhaCadastro() {
+        try {
+            return scanner.nextLine();
+        } catch (java.util.NoSuchElementException erro) {
+            System.out.println("-> Cadastro cancelado: entrada encerrada antes de concluir todos os campos.");
+            return null;
+        }
     }
 }
 

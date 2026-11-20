@@ -8,6 +8,7 @@ public class Main {
             GerenciadorClientes gerClientes = new GerenciadorClientes(scanner);
             GerenciadorConsultores gerConsultores = new GerenciadorConsultores(scanner);
             GerenciadorFaturamento gerFaturamento = new GerenciadorFaturamento(scanner, gerClientes);
+            gerClientes.definirVerificadorDeContratoAtivo(gerFaturamento::possuiContratoAtivo);
 
             int opcao;
 
@@ -33,6 +34,11 @@ public class Main {
                 System.out.println("-----------------------------------");
                 System.out.println("0. Sair");
                 System.out.print("Escolha uma opção: ");
+
+                if (!scanner.hasNextLine()) {
+                    System.out.println("\nEntrada encerrada. Finalizando sistema.");
+                    break;
+                }
 
                 try {
                     opcao = Integer.parseInt(scanner.nextLine());

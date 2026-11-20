@@ -102,6 +102,23 @@ public class GerenciadorFaturamento {
         }
     }
 
+    public boolean possuiContratoAtivo(Cliente cliente) {
+        return contratos.stream().filter(contrato -> contrato.getCliente() == cliente)
+                .anyMatch(contrato -> {
+                    boolean possuiFaturaPendente = faturamentoService.getFaturas().stream()
+                            .anyMatch(fatura -> fatura.getContratoId().equals(contrato.getId())
+                                    && !fatura.isPaga());
+                    if (possuiFaturaPendente) {
+                        return true;
+                    }
+                    if (contrato.getModalidadePagamento() == ModalidadePagamento.ENTREGA_FINAL) {
+                        return !contrato.getProjeto().isEntregaFinalFaturada();
+                    }
+                    return contrato.getProjeto().getEtapas().stream()
+                            .anyMatch(etapa -> !etapa.isFaturada());
+                });
+    }
+
     public void concluirEtapa() {
         ContratoConsoleAdapter contrato = selecionarContrato();
         if (contrato == null) {
