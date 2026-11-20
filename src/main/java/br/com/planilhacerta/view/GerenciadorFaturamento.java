@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static br.com.planilhacerta.view.EntradaConsole.lerLinha;
+
 public class GerenciadorFaturamento {
     private final Scanner scanner;
     private final GerenciadorClientes gerenciadorClientes;
@@ -43,7 +45,7 @@ public class GerenciadorFaturamento {
         }
 
         System.out.print("ID do contrato: ");
-        String contratoId = scanner.nextLine().trim();
+        String contratoId = lerLinha(scanner).trim();
         if (contratoId.isEmpty() || contratos.stream().anyMatch(c -> c.getId().equals(contratoId))) {
             System.out.println("ID vazio ou já utilizado.");
             return;
@@ -56,14 +58,14 @@ public class GerenciadorFaturamento {
         for (int indice = 1; indice <= quantidadeEtapas; indice++) {
             System.out.println("Etapa " + indice + ":");
             System.out.print("  ID: ");
-            String etapaId = scanner.nextLine().trim();
+            String etapaId = lerLinha(scanner).trim();
             if (etapaId.isEmpty() || etapas.stream().anyMatch(e -> e.getId().equals(etapaId))) {
                 System.out.println("ID de etapa vazio ou repetido; tente novamente.");
                 indice--;
                 continue;
             }
             System.out.print("  Nome: ");
-            String nome = scanner.nextLine().trim();
+            String nome = lerLinha(scanner).trim();
             BigDecimal valor = lerValor("  Valor (R$): ");
             try {
                 etapas.add(new ContratoConsoleAdapter.Etapa(etapaId, nome, valor));
@@ -223,7 +225,7 @@ public class GerenciadorFaturamento {
 
     private void registrarPagamentoPendente(List<Fatura> faturas) {
         System.out.print("ID da fatura: ");
-        String faturaId = scanner.nextLine().trim();
+        String faturaId = lerLinha(scanner).trim();
         Fatura fatura = faturas.stream()
                 .filter(item -> item.getId().equals(faturaId))
                 .findFirst()
@@ -272,7 +274,7 @@ public class GerenciadorFaturamento {
 
     private Cliente selecionarCliente() {
         System.out.print("ID do cliente (vazio para cancelar): ");
-        String id = scanner.nextLine().trim();
+        String id = lerLinha(scanner).trim();
         if (id.isEmpty()) {
             return null;
         }
@@ -289,7 +291,7 @@ public class GerenciadorFaturamento {
             return null;
         }
         System.out.print("ID do contrato (vazio para cancelar): ");
-        String id = scanner.nextLine().trim();
+        String id = lerLinha(scanner).trim();
         if (id.isEmpty()) {
             return null;
         }
@@ -310,7 +312,7 @@ public class GerenciadorFaturamento {
                     + " (" + (etapa.isConcluida() ? "Concluída" : "Pendente") + ")");
         }
         System.out.print("ID da etapa (vazio para cancelar): ");
-        String id = scanner.nextLine().trim();
+        String id = lerLinha(scanner).trim();
         if (id.isEmpty()) {
             return null;
         }
@@ -349,7 +351,7 @@ public class GerenciadorFaturamento {
         while (true) {
             System.out.print(prompt);
             try {
-                int valor = Integer.parseInt(scanner.nextLine().trim());
+                int valor = Integer.parseInt(lerLinha(scanner).trim());
                 if (valor >= minimo && valor <= maximo) {
                     return valor;
                 }
@@ -365,7 +367,7 @@ public class GerenciadorFaturamento {
         while (true) {
             System.out.print(prompt);
             try {
-                BigDecimal valor = new BigDecimal(scanner.nextLine().trim().replace(',', '.'));
+                BigDecimal valor = new BigDecimal(lerLinha(scanner).trim().replace(',', '.'));
                 if (valor.signum() < 0) {
                     System.out.println("O valor não pode ser negativo.");
                     continue;
@@ -381,6 +383,6 @@ public class GerenciadorFaturamento {
 
     private boolean confirmar(String prompt) {
         System.out.print(prompt);
-        return scanner.nextLine().trim().equalsIgnoreCase("s");
+        return lerLinha(scanner).trim().equalsIgnoreCase("s");
     }
 }

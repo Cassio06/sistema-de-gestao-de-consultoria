@@ -35,13 +35,8 @@ public class Main {
                 System.out.println("0. Sair");
                 System.out.print("Escolha uma opção: ");
 
-                if (!scanner.hasNextLine()) {
-                    System.out.println("\nEntrada encerrada. Finalizando sistema.");
-                    break;
-                }
-
                 try {
-                    opcao = Integer.parseInt(scanner.nextLine());
+                    opcao = Integer.parseInt(EntradaConsole.lerLinha(scanner));
                 } catch (NumberFormatException e) {
                     opcao = -1;
                 }
@@ -66,6 +61,8 @@ public class Main {
                     default -> System.out.println("Opção inválida! Tente novamente.");
                 }
             } while (opcao != 0);
+        } catch (EntradaConsole.Encerrada erro) {
+            System.out.println("\nEntrada encerrada. Finalizando sistema.");
         }
     }
 }

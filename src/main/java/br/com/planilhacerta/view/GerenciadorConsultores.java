@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static br.com.planilhacerta.view.EntradaConsole.lerLinha;
+
 public class GerenciadorConsultores {
     private final List<Consultor> consultores = new ArrayList<>();
     private final Scanner scanner;
@@ -20,13 +22,13 @@ public class GerenciadorConsultores {
 
     public void cadastrar() {
         System.out.print("ID do Consultor: ");
-        String id = scanner.nextLine();
+        String id = lerLinha(scanner);
         System.out.print("Nome: ");
-        String nome = scanner.nextLine();
+        String nome = lerLinha(scanner);
         System.out.print("E-mail: ");
-        String email = scanner.nextLine();
+        String email = lerLinha(scanner);
         System.out.print("Especialidade: ");
-        String especialidade = scanner.nextLine();
+        String especialidade = lerLinha(scanner);
 
         consultores.add(new Consultor(id, nome, email, especialidade));
         System.out.println("-> Consultor cadastrado com sucesso!");
@@ -45,21 +47,22 @@ public class GerenciadorConsultores {
 
     public void editar() {
         System.out.print("Informe o ID do consultor que deseja editar: ");
-        String id = scanner.nextLine();
+        String id = lerLinha(scanner);
         Consultor con = buscarPorId(id);
 
         if (con != null) {
             System.out.print("Novo nome (" + con.getNome() + "): ");
-            String nome = scanner.nextLine();
-            if (!nome.isEmpty()) con.setNome(nome);
+            String nome = lerLinha(scanner);
 
             System.out.print("Novo e-mail (" + con.getEmail() + "): ");
-            String email = scanner.nextLine();
-            if (!email.isEmpty()) con.setEmail(email);
+            String email = lerLinha(scanner);
 
             System.out.print("Nova especialidade (" + con.getEspecialidade() + "): ");
-            String esp = scanner.nextLine();
-            if (!esp.isEmpty()) con.setEspecialidade(esp);
+            String especialidade = lerLinha(scanner);
+
+            if (!nome.isEmpty()) con.setNome(nome);
+            if (!email.isEmpty()) con.setEmail(email);
+            if (!especialidade.isEmpty()) con.setEspecialidade(especialidade);
 
             System.out.println("-> Consultor atualizado com sucesso!");
         } else {
@@ -69,7 +72,7 @@ public class GerenciadorConsultores {
 
     public void remover() {
         System.out.print("Informe o ID do consultor que deseja remover: ");
-        String id = scanner.nextLine();
+        String id = lerLinha(scanner);
         Consultor con = buscarPorId(id);
         if (con != null) {
             consultores.remove(con);

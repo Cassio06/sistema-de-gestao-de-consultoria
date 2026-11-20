@@ -12,6 +12,7 @@ import br.com.planilhacerta.service.FaturamentoService;
 import br.com.planilhacerta.service.FidelidadeService;
 import br.com.planilhacerta.service.RecomendacaoService;
 import br.com.planilhacerta.view.GerenciadorClientes;
+import br.com.planilhacerta.view.GerenciadorConsultores;
 import br.com.planilhacerta.view.Main;
 
 import java.io.ByteArrayInputStream;
@@ -23,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class RegrasFaturamentoFidelidadeRecomendacaoTest {
@@ -40,6 +42,8 @@ public class RegrasFaturamentoFidelidadeRecomendacaoTest {
         testaRecomendacoesParaHistoricoERelatorioVip();
         testaFluxoDeFaturamentoNoMenu();
         testaMenuRejeitaFracaoDeCentavo();
+        testaEncerramentoDaEntradaNoMenu();
+        testaEdicoesInterrompidasPreservamCadastro();
         System.out.println("Todos os testes de faturamento, fidelidade e recomendação passaram.");
     }
 
@@ -262,19 +266,7 @@ public class RegrasFaturamentoFidelidadeRecomendacaoTest {
                 "12", "contrato-menu", "etapa-menu", "s",
                 "15", "cliente-menu-vip",
                 "0", "");
-        ByteArrayOutputStream saida = new ByteArrayOutputStream();
-        InputStream entradaOriginal = System.in;
-        PrintStream saidaOriginal = System.out;
-        try {
-            System.setIn(new ByteArrayInputStream(entrada.getBytes(StandardCharsets.UTF_8)));
-            System.setOut(new PrintStream(saida, true, StandardCharsets.UTF_8));
-            Main.main(new String[0]);
-        } finally {
-            System.setIn(entradaOriginal);
-            System.setOut(saidaOriginal);
-        }
-
-        String resultado = saida.toString(StandardCharsets.UTF_8);
+        String resultado = executarMenu(entrada);
         verificar(resultado.contains("9. Criar contrato com projeto e etapas"),
                 "O menu deve expor a criação de contratos");
         verificar(resultado.contains("Total: R$ 180.00"),
@@ -293,6 +285,42 @@ public class RegrasFaturamentoFidelidadeRecomendacaoTest {
                 "11", "contrato-centavo", "etapa-centavo",
                 "12", "contrato-centavo", "etapa-centavo", "s",
                 "0", "");
+        String resultado = executarMenu(entrada);
+        verificar(resultado.contains("O valor deve ter no máximo duas casas decimais."),
+                "O menu deve rejeitar valores com frações de centavo");
+        verificar(resultado.contains("Subtotal: R$ 0.01")
+                        && resultado.contains("Pagamento registrado: R$ 0.01"),
+                "O menu deve emitir e pagar usando o valor monetário válido informado em seguida");
+    }
+
+    private static void testaEncerramentoDaEntradaNoMenu() {
+        String cadastro = "1\nCLI\nAna\nana@example.com\nEmpresa\nn\n";
+        for (String entrada : List.of("", "1\nCLI\n", "3\n", "4\n", "5\n",
+                cadastro + "9\nCLI\nCTR\n1\n1\n1\nET\nDiagnóstico\n")) {
+            verificar(executarMenu(entrada).contains("Entrada encerrada. Finalizando sistema."),
+                    "O menu deve encerrar normalmente mesmo quando a entrada termina durante uma operação");
+        }
+    }
+
+    private static void testaEdicoesInterrompidasPreservamCadastro() {
+        try (Scanner entradaCliente = new Scanner("CLI\nAna\nana@example.com\nEmpresa\nn\nCLI\nOutro nome\n");
+             Scanner entradaConsultor = new Scanner("CON\nBruno\nbruno@example.com\nTI\nCON\nOutro nome\n")) {
+            GerenciadorClientes clientes = new GerenciadorClientes(entradaCliente);
+            GerenciadorConsultores consultores = new GerenciadorConsultores(entradaConsultor);
+            clientes.cadastrar();
+            consultores.cadastrar();
+
+            esperar(NoSuchElementException.class, clientes::editar);
+            esperar(NoSuchElementException.class, consultores::editar);
+
+            verificar(clientes.buscarPorId("CLI").getNome().equals("Ana"),
+                    "Uma edição interrompida deve preservar o nome original do cliente");
+            verificar(consultores.buscarPorId("CON").getNome().equals("Bruno"),
+                    "Uma edição interrompida deve preservar o nome original do consultor");
+        }
+    }
+
+    private static String executarMenu(String entrada) {
         ByteArrayOutputStream saida = new ByteArrayOutputStream();
         InputStream entradaOriginal = System.in;
         PrintStream saidaOriginal = System.out;
@@ -305,12 +333,7 @@ public class RegrasFaturamentoFidelidadeRecomendacaoTest {
             System.setOut(saidaOriginal);
         }
 
-        String resultado = saida.toString(StandardCharsets.UTF_8);
-        verificar(resultado.contains("O valor deve ter no máximo duas casas decimais."),
-                "O menu deve rejeitar valores com frações de centavo");
-        verificar(resultado.contains("Subtotal: R$ 0.01")
-                        && resultado.contains("Pagamento registrado: R$ 0.01"),
-                "O menu deve emitir e pagar usando o valor monetário válido informado em seguida");
+        return saida.toString(StandardCharsets.UTF_8);
     }
 
     private static ContratoFake contrato(String id, ClienteFake cliente, ModalidadePagamento modalidade,
