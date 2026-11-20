@@ -1,0 +1,10 @@
+target/
+.vscode/
+.idea/
+*.iml
+dados_planilha_certa.json
+dados_planilha_certa.bak.json
+relatorio_planilha_certa.csv
+relatorios_pdf/
+credentials.json
+.env
