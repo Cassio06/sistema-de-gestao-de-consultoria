@@ -23,8 +23,13 @@ public class PersistenciaService {
                 .setPrettyPrinting()
                 .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) ->
                         new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE)))
-                .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) ->
-                        LocalDate.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE))
+                .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, typeOfT, context) -> {
+                    try {
+                        return LocalDate.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE);
+                    } catch (Exception e) {
+                        throw new JsonParseException("Data inválida no JSON: " + json, e);
+                    }
+                })
                 .create();
         this.driveService = new GoogleDriveService();
     }
@@ -99,11 +104,12 @@ public class PersistenciaService {
     private BancoDados lerArquivoJson(String caminho) {
         try (Reader reader = new InputStreamReader(new FileInputStream(caminho), StandardCharsets.UTF_8)) {
             BancoDados dados = gson.fromJson(reader, BancoDados.class);
-            if (dados != null) {
-                dados.sanitizar();
+            if (dados == null || dados.clientes == null || dados.consultores == null || dados.projetos == null) {
+                return null;
             }
+            dados.sanitizar();
             return dados;
-        } catch (JsonParseException | IOException e) {
+        } catch (Exception e) {
             return null;
         }
     }

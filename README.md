@@ -130,11 +130,9 @@ sistema-de-gestao-de-consultoria/
    - Copie o arquivo `.env.example` para `.env` caso utilize credenciais externas (como API do Google Drive).
 4. **Compilação e execução (prevista):**
    ```bash
-   # Compilar os arquivos Java (quando implementados)
-   javac -d out $(find src/main/java -name "*.java")
-
-   # Executar a aplicação principal
-   java -cp out br.com.planilhacerta.Main
+   4. **Compilação e execução via Maven:**
+   ```bash
+   mvn clean compile exec:java -Dexec.mainClass="ui.MenuPrincipal"
    ```
    *(Caso o grupo adote Maven ou Gradle na etapa de codificação, os comandos `mvn compile exec:java` ou `./gradlew run` serão atualizados nesta seção).*
 
